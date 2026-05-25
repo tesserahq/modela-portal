@@ -184,7 +184,7 @@ export default function CredentialsIndex() {
   if (error) {
     return (
       <EmptyContent
-        image="/images/empty-credential.png"
+        image="/images/error.png"
         title="Failed to get credentials"
         description={error.message}
       />

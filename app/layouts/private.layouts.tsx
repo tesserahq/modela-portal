@@ -67,11 +67,6 @@ export default function PrivateLayout() {
       icon: KeyRound,
     },
     {
-      title: 'Context Sources',
-      path: `/context-sources`,
-      icon: Database,
-    },
-    {
       title: 'MCP Servers',
       path: `/mcp-servers`,
       icon: Server,
@@ -88,6 +83,7 @@ export default function PrivateLayout() {
         <Layout.Header
           actionLogout={() => navigate('/logout')}
           actionProfile={() => {}}
+          defaultLogo={'/images/logo.png'}
           onSetTheme={(theme) => onSetTheme(theme)}
           selectedTheme={requestInfo.userPrefs.theme || 'system'}
           title={SITE_CONFIG.siteTitle}

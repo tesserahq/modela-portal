@@ -20,15 +20,6 @@ export default [
         route('overview', 'routes/main/credentials/details/overview.tsx'),
       ]),
     ]),
-    route('/context-sources', 'routes/main/context-sources/layout.tsx', [
-      index('routes/main/context-sources/index.tsx'),
-      route('new', 'routes/main/context-sources/new.tsx'),
-      route(':contextSourceID/edit', 'routes/main/context-sources/edit.tsx'),
-      route(':contextSourceID', 'routes/main/context-sources/details/layout.tsx', [
-        index('routes/main/context-sources/details/index.tsx'),
-        route('overview', 'routes/main/context-sources/details/overview.tsx'),
-      ]),
-    ]),
     route('/mcp-servers', 'routes/main/mcp-servers/layout.tsx', [
       index('routes/main/mcp-servers/index.tsx'),
       route('new', 'routes/main/mcp-servers/new.tsx'),

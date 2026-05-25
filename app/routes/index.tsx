@@ -43,8 +43,8 @@ export default function Index() {
       <div className="max-w-[400px] flex-col items-center lg:items-start">
         <h1 className="mt-3 text-3xl font-semibold dark:text-white">Welcome back!</h1>
         <p className="mt-1 text-base opacity-70 dark:text-primary-foreground">
-          Log in to access Conversa Portal! Conversational interface service for the Tessera
-          platform
+          Log in to access Modela Portal! Central service responsible for handling large language
+          models
         </p>
         <div className="mt-5">
           <Button onClick={() => loginWithRedirect()}>Login</Button>

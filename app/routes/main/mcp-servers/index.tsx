@@ -236,7 +236,7 @@ export default function McpServersIndex() {
   if (error) {
     return (
       <EmptyContent
-        image="/images/empty-mcp-server.png"
+        image="/images/error.png"
         title="Failed to get MCP servers"
         description={error.message}
       />
