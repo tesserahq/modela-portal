@@ -10,7 +10,7 @@ import { Button } from '@shadcn/ui/button'
 import { Edit, EllipsisVertical, RefreshCw, Trash2 } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useLoaderData, useNavigate, useParams } from 'react-router'
-import { ResourceID, useApp } from 'tessera-ui'
+import { EmptyContent, ResourceID, useApp } from 'tessera-ui'
 import { DateTime } from 'tessera-ui/components'
 import DeleteConfirmation, {
   type DeleteConfirmationHandle,
@@ -33,7 +33,7 @@ export default function McpServerOverview() {
 
   const config = { apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv }
 
-  const { data: mcpServer, isLoading } = useMcpServer(config, id)
+  const { data: mcpServer, isLoading, error } = useMcpServer(config, id)
 
   const { mutateAsync: deleteMcpServer } = useDeleteMcpServer(config, {
     onSuccess: () => {
@@ -67,6 +67,16 @@ export default function McpServerOverview() {
 
   if (isLoading || !token) {
     return <AppPreloader className="min-h-screen" />
+  }
+
+  if (error) {
+    return (
+      <EmptyContent
+        image="/images/error.png"
+        title="Failed to get mcp server"
+        description={error.message}
+      />
+    )
   }
 
   return (

@@ -1,6 +1,6 @@
 import { AppPreloader } from '@/components/loader/pre-loader'
 import { DetailContent } from '@/components/detail-content'
-import { ResourceID, useApp } from 'tessera-ui'
+import { EmptyContent, ResourceID, useApp } from 'tessera-ui'
 import { Popover, PopoverContent, PopoverTrigger } from '@/modules/shadcn/ui/popover'
 import { useCredential, useDeleteCredential } from '@/resources/hooks/credentials/use-credential'
 import { Button } from '@shadcn/ui/button'
@@ -31,7 +31,7 @@ export default function CredentialOverview() {
 
   const config = { apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv }
 
-  const { data: credential, isLoading } = useCredential(config, id)
+  const { data: credential, isLoading, error } = useCredential(config, id)
 
   const { mutateAsync: deleteCredential } = useDeleteCredential(config, {
     onSuccess: () => {
@@ -54,6 +54,16 @@ export default function CredentialOverview() {
 
   if (isLoading || !token) {
     return <AppPreloader className="min-h-screen" />
+  }
+
+  if (error) {
+    return (
+      <EmptyContent
+        image="/images/error.png"
+        title="Failed to get credentials"
+        description={error.message}
+      />
+    )
   }
 
   return (

@@ -143,12 +143,12 @@ export function CredentialForm({
   const { data: credentialTypes, isLoading } = useCredentialTypes(config)
 
   const schema = useMemo(() => {
-    return credentialTypes?.length
-      ? createCredentialFormSchema(credentialTypes)
+    return credentialTypes?.total
+      ? createCredentialFormSchema(credentialTypes.items)
       : credentialFormSchema
   }, [credentialTypes])
 
-  const credentialTypeOptions = credentialTypes
+  const credentialTypeOptions = credentialTypes?.items
     ?.map((credentialType) => {
       const { icon, displayName } = getCredentialTypeDisplay(credentialType.type_name)
       return {
@@ -203,7 +203,10 @@ export function CredentialForm({
             isLoading={isLoading}
           />
 
-          <CustomFields credentialTypes={credentialTypes || []} defaultValues={defaultValues} />
+          <CustomFields
+            credentialTypes={credentialTypes?.items || []}
+            defaultValues={defaultValues}
+          />
 
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => navigate('/credentials')}>

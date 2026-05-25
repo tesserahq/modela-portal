@@ -229,6 +229,7 @@ export function useDeleteCredential(
  */
 export function useCredentialTypes(
   config: IQueryConfig,
+  params?: IQueryParams,
   options?: {
     enabled?: boolean
     staleTime?: number
@@ -242,7 +243,7 @@ export function useCredentialTypes(
           throw new QueryError('Token is required', 'TOKEN_REQUIRED')
         }
 
-        return await getCredentialTypes(config)
+        return await getCredentialTypes(config, params)
       } catch (error: any) {
         throw new QueryError(error)
       }

@@ -243,12 +243,12 @@ export default function McpServersIndex() {
     )
   }
 
-  if (data?.items.length === 0) {
+  if (data?.total === 0) {
     return (
       <EmptyContent
-        image="/images/empty-mcp-server.png"
+        image="/images/empty-data.png"
         title="No MCP servers found"
-        description="Get started by registering your first MCP server.">
+        description="Get started by registering first MCP server.">
         <Button onClick={() => navigate('/mcp-servers/new')} variant="black">
           Start Creating
         </Button>

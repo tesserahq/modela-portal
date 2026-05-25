@@ -191,12 +191,12 @@ export default function CredentialsIndex() {
     )
   }
 
-  if (data?.items.length === 0) {
+  if (data?.total === 0) {
     return (
       <EmptyContent
-        image="/images/empty-credential.png"
+        image="/images/empty-data.png"
         title="No credentials found"
-        description="Get started by creating your first credential.">
+        description="Get started by creating first credential.">
         <Button onClick={() => navigate('/credentials/new')} variant="black">
           Start Creating
         </Button>
