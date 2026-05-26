@@ -29,6 +29,15 @@ export default [
         route('overview', 'routes/main/mcp-servers/details/overview.tsx'),
       ]),
     ]),
+    route('/model-configs', 'routes/main/model-configs/layout.tsx', [
+      index('routes/main/model-configs/index.tsx'),
+      route('new', 'routes/main/model-configs/new.tsx'),
+      route(':modelConfigID/edit', 'routes/main/model-configs/edit.tsx'),
+      route(':modelConfigID', 'routes/main/model-configs/details/layout.tsx', [
+        index('routes/main/model-configs/details/index.tsx'),
+        route('overview', 'routes/main/model-configs/details/overview.tsx'),
+      ]),
+    ]),
   ]),
 
   // Access Denied

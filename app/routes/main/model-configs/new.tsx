@@ -1,0 +1,44 @@
+import { CredentialForm } from '@/components/crud-forms/credential-form'
+import { useCreateCredential } from '@/resources/hooks/credentials/use-credential'
+import { credentialFormDefaultValue } from '@/resources/queries/credentials/credential.schema'
+import { CredentialFormData } from '@/resources/queries/credentials/credential.type'
+import { IQueryConfig } from '@/resources/queries'
+import { useLoaderData, useNavigate } from 'react-router'
+import { useApp } from 'tessera-ui'
+import { useCreateModelConfig } from '@/resources/hooks/model-config/use-model-config'
+import { ModelConfigFormData } from '@/resources/queries/model-config/model-config.type'
+import { ModelConfigForm } from '@/components/crud-forms/model-config-form'
+import { modelConfigFormDefaultValue } from '@/resources/queries/model-config'
+
+export async function loader() {
+  const apiUrl = process.env.API_URL
+  const nodeEnv = process.env.NODE_ENV
+
+  return { apiUrl, nodeEnv }
+}
+
+export default function NewModelConfig() {
+  const { apiUrl, nodeEnv } = useLoaderData<typeof loader>()
+  const { token } = useApp()
+  const navigate = useNavigate()
+
+  const config: IQueryConfig = { apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv! }
+
+  const { mutateAsync: createModelConfig } = useCreateModelConfig(config, {
+    onSuccess: (data) => {
+      navigate(`/credentials/${data.id}`)
+    },
+  })
+
+  const handleSubmit = async (data: ModelConfigFormData): Promise<void> => {
+    await createModelConfig(data)
+  }
+
+  return (
+    <ModelConfigForm
+      onSubmit={handleSubmit}
+      defaultValues={modelConfigFormDefaultValue}
+      config={config}
+    />
+  )
+}

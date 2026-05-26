@@ -1,17 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IQueryConfig, IQueryParams } from '@/resources/queries'
 import {
-  createContextSource,
-  deleteContextSource,
-  getContextSource,
-  getContextSources,
-  updateContextSource,
-} from '@/resources/queries/context-sources/context-source.queries'
+  CreateModelConfigData,
+  getModelConfig,
+  getModelConfigs,
+  ModelConfigType,
+} from '@/resources/queries/model-config'
 import {
-  ContextSourceType,
-  CreateContextSourceData,
-  UpdateContextSourceData,
-} from '@/resources/queries/context-sources/context-source.type'
+  createModelConfig,
+  deleteModelConfig,
+} from '@/resources/queries/model-config/model-config.queries'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'tessera-ui/components'
 
@@ -28,7 +26,7 @@ class QueryError extends Error {
 }
 
 export const contextSourceQueryKeys = {
-  all: ['context-sources'] as const,
+  all: ['model-config'] as const,
   lists: () => [...contextSourceQueryKeys.all, 'list'] as const,
   list: (config: IQueryConfig, params: IQueryParams) =>
     [...contextSourceQueryKeys.lists(), config, params] as const,
@@ -36,7 +34,7 @@ export const contextSourceQueryKeys = {
   detail: (id: string) => [...contextSourceQueryKeys.details(), id] as const,
 }
 
-export function useContextSources(
+export function useModelConfigs(
   config: IQueryConfig,
   params: IQueryParams,
   options?: {
@@ -52,7 +50,7 @@ export function useContextSources(
           throw new QueryError('Token is required', 'TOKEN_REQUIRED')
         }
 
-        return await getContextSources(config, params)
+        return await getModelConfigs(config, params)
       } catch (error: any) {
         throw new QueryError(error)
       }
@@ -62,7 +60,7 @@ export function useContextSources(
   })
 }
 
-export function useContextSource(
+export function useModelConfig(
   config: IQueryConfig,
   id: string,
   options?: {
@@ -78,7 +76,7 @@ export function useContextSource(
           throw new QueryError('Token is required', 'TOKEN_REQUIRED')
         }
 
-        return await getContextSource(config, id)
+        return await getModelConfig(config, id)
       } catch (error: any) {
         throw new QueryError(error)
       }
@@ -88,74 +86,74 @@ export function useContextSource(
   })
 }
 
-export function useCreateContextSource(
+export function useCreateModelConfig(
   config: IQueryConfig,
   options?: {
-    onSuccess?: (data: ContextSourceType) => void
+    onSuccess?: (data: ModelConfigType) => void
     onError?: (error: Error) => void
   }
 ) {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: CreateContextSourceData) => {
+    mutationFn: async (data: CreateModelConfigData) => {
       try {
         if (!config.token) {
           throw new QueryError('Token is required', 'TOKEN_REQUIRED')
         }
 
-        return await createContextSource(config, data)
+        return await createModelConfig(config, data)
       } catch (error: any) {
         throw new QueryError(error)
       }
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
-      toast.success('Context source created successfully', { duration: 3000 })
+      toast.success('Model config created successfully', { duration: 3000 })
       options?.onSuccess?.(data)
     },
     onError: (error: Error) => {
-      toast.error('Failed to create context source', { description: error.message })
+      toast.error('Failed to create model config', { description: error.message })
       options?.onError?.(error)
     },
   })
 }
 
-export function useUpdateContextSource(
-  config: IQueryConfig,
-  options?: {
-    onSuccess?: (data: ContextSourceType) => void
-    onError?: (error: QueryError) => void
-  }
-) {
-  const queryClient = useQueryClient()
+// export function useUpdateContextSource(
+//   config: IQueryConfig,
+//   options?: {
+//     onSuccess?: (data: ContextSourceType) => void
+//     onError?: (error: QueryError) => void
+//   }
+// ) {
+//   const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: UpdateContextSourceData }) => {
-      try {
-        if (!config.token) {
-          throw new QueryError('Token is required', 'TOKEN_REQUIRED')
-        }
+//   return useMutation({
+//     mutationFn: async ({ id, data }: { id: string; data: UpdateContextSourceData }) => {
+//       try {
+//         if (!config.token) {
+//           throw new QueryError('Token is required', 'TOKEN_REQUIRED')
+//         }
 
-        return await updateContextSource(config, id, data)
-      } catch (error: any) {
-        throw new QueryError(error)
-      }
-    },
-    onSuccess: (data) => {
-      queryClient.setQueryData(contextSourceQueryKeys.detail(data.id), data)
-      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
-      toast.success('Context source updated successfully', { duration: 3000 })
-      options?.onSuccess?.(data)
-    },
-    onError: (error: Error) => {
-      toast.error('Failed to update context source', { description: error.message })
-      options?.onError?.(error)
-    },
-  })
-}
+//         return await updateContextSource(config, id, data)
+//       } catch (error: any) {
+//         throw new QueryError(error)
+//       }
+//     },
+//     onSuccess: (data) => {
+//       queryClient.setQueryData(contextSourceQueryKeys.detail(data.id), data)
+//       queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
+//       toast.success('Context source updated successfully', { duration: 3000 })
+//       options?.onSuccess?.(data)
+//     },
+//     onError: (error: Error) => {
+//       toast.error('Failed to update context source', { description: error.message })
+//       options?.onError?.(error)
+//     },
+//   })
+// }
 
-export function useDeleteContextSource(
+export function useDeleteModelConfig(
   config: IQueryConfig,
   options?: {
     onSuccess?: () => void
@@ -171,7 +169,7 @@ export function useDeleteContextSource(
           throw new QueryError('Token is required', 'TOKEN_REQUIRED')
         }
 
-        return await deleteContextSource(config, id)
+        return await deleteModelConfig(config, id)
       } catch (error: any) {
         throw new QueryError(error)
       }
@@ -179,7 +177,7 @@ export function useDeleteContextSource(
     onSuccess: (_, id) => {
       queryClient.removeQueries({ queryKey: contextSourceQueryKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
-      toast.success('Context source deleted successfully', { duration: 3000 })
+      toast.success('Model config deleted successfully', { duration: 3000 })
       options?.onSuccess?.()
     },
     onError: (error: Error) => {
