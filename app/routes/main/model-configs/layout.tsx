@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router'
 
-export default function CredentialsLayout() {
+export default function ModelConfigsLayout() {
   return <Outlet />
 }

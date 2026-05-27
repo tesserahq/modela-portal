@@ -5,10 +5,12 @@ import {
   getModelConfig,
   getModelConfigs,
   ModelConfigType,
+  UpdateModelConfigData,
 } from '@/resources/queries/model-config'
 import {
   createModelConfig,
   deleteModelConfig,
+  updateModelConfig,
 } from '@/resources/queries/model-config/model-config.queries'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'tessera-ui/components'
@@ -119,39 +121,39 @@ export function useCreateModelConfig(
   })
 }
 
-// export function useUpdateContextSource(
-//   config: IQueryConfig,
-//   options?: {
-//     onSuccess?: (data: ContextSourceType) => void
-//     onError?: (error: QueryError) => void
-//   }
-// ) {
-//   const queryClient = useQueryClient()
+export function useUpdateModelConfig(
+  config: IQueryConfig,
+  options?: {
+    onSuccess?: (data: ModelConfigType) => void
+    onError?: (error: QueryError) => void
+  }
+) {
+  const queryClient = useQueryClient()
 
-//   return useMutation({
-//     mutationFn: async ({ id, data }: { id: string; data: UpdateContextSourceData }) => {
-//       try {
-//         if (!config.token) {
-//           throw new QueryError('Token is required', 'TOKEN_REQUIRED')
-//         }
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: UpdateModelConfigData }) => {
+      try {
+        if (!config.token) {
+          throw new QueryError('Token is required', 'TOKEN_REQUIRED')
+        }
 
-//         return await updateContextSource(config, id, data)
-//       } catch (error: any) {
-//         throw new QueryError(error)
-//       }
-//     },
-//     onSuccess: (data) => {
-//       queryClient.setQueryData(contextSourceQueryKeys.detail(data.id), data)
-//       queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
-//       toast.success('Context source updated successfully', { duration: 3000 })
-//       options?.onSuccess?.(data)
-//     },
-//     onError: (error: Error) => {
-//       toast.error('Failed to update context source', { description: error.message })
-//       options?.onError?.(error)
-//     },
-//   })
-// }
+        return await updateModelConfig(config, id, data)
+      } catch (error: any) {
+        throw new QueryError(error)
+      }
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(contextSourceQueryKeys.detail(data.id), data)
+      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
+      toast.success('Model config  updated successfully', { duration: 3000 })
+      options?.onSuccess?.(data)
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to update model config ', { description: error.message })
+      options?.onError?.(error)
+    },
+  })
+}
 
 export function useDeleteModelConfig(
   config: IQueryConfig,
@@ -181,7 +183,7 @@ export function useDeleteModelConfig(
       options?.onSuccess?.()
     },
     onError: (error: Error) => {
-      toast.error('Failed to delete context source', { description: error.message })
+      toast.error('Failed to delete model config', { description: error.message })
       options?.onError?.(error)
     },
   })

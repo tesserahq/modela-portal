@@ -1,14 +1,23 @@
-import { CredentialForm } from '@/components/crud-forms/credential-form'
 import { AppPreloader } from '@/components/loader/pre-loader'
-import { useCredential, useUpdateCredential } from '@/resources/hooks/credentials/use-credential'
 import {
   credentialToFormValues,
   getChangedCredentialUpdateData,
 } from '@/resources/queries/credentials/credential.utils'
-import { CredentialFormData } from '@/resources/queries/credentials/credential.type'
 import { IQueryConfig } from '@/resources/queries'
 import { useLoaderData, useNavigate, useParams } from 'react-router'
-import { useApp } from 'tessera-ui'
+import { EmptyContent, useApp } from 'tessera-ui'
+import {
+  useModelConfig,
+  useUpdateModelConfig,
+} from '@/resources/hooks/model-config/use-model-config'
+import {
+  getChangedModelConfigUpdateData,
+  modelConfigToFormValues,
+  UpdateModelConfigData,
+} from '@/resources/queries/model-config'
+import { ModelConfigFormData } from '@/resources/queries/model-config/model-config.type'
+import { Button } from '@/modules/shadcn/ui/button'
+import { ModelConfigForm } from '@/components/crud-forms/model-config-form'
 
 export async function loader() {
   const apiUrl = process.env.API_URL
@@ -17,52 +26,57 @@ export async function loader() {
   return { apiUrl, nodeEnv }
 }
 
-export default function EditCredential() {
+export default function EditModelConfig() {
   const { apiUrl, nodeEnv } = useLoaderData<typeof loader>()
   const { token } = useApp()
   const navigate = useNavigate()
-  const { credentialID } = useParams()
+  const { modelConfigID } = useParams()
 
   const config: IQueryConfig = { apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv! }
 
-  const {
-    data: credential,
-    isLoading,
-    error,
-  } = useCredential(config, credentialID!, {
-    enabled: !!credentialID && !!token,
+  const { data, isLoading, error } = useModelConfig(config, modelConfigID!, {
+    enabled: !!modelConfigID && !!token,
   })
 
-  const { mutateAsync: updateCredential } = useUpdateCredential(config, {
+  const { mutateAsync: updateConfig } = useUpdateModelConfig(config, {
     onSuccess: (data) => {
-      navigate(`/credentials/${data.id}`)
+      navigate(`/model-configs/${data.id}`)
     },
   })
 
-  const handleSubmit = async (data: CredentialFormData): Promise<void> => {
-    if (!credentialID || !credential) return
+  const handleSubmit = async (rawData: ModelConfigFormData): Promise<void> => {
+    if (!modelConfigID || !data) return
 
-    const changedData = getChangedCredentialUpdateData(credential, data)
+    const changedData = getChangedModelConfigUpdateData(data, rawData)
 
     if (Object.keys(changedData).length === 0) {
-      navigate(`/credentials/${credentialID}`)
+      navigate(`/model-configs/${modelConfigID}`)
       return
     }
-    await updateCredential({ id: credentialID, data: changedData })
+    await updateConfig({ id: modelConfigID, data: changedData })
   }
 
-  if (isLoading || !credential) {
+  if (isLoading || !data) {
     return <AppPreloader />
   }
 
   if (error) {
-    return <div className="p-5 text-destructive">Failed to load credential: {error.message}</div>
+    return (
+      <EmptyContent
+        image="/images/error.png"
+        title="Failed to get model config"
+        description={error.message}>
+        <Button onClick={() => navigate('/model-configs')} variant="black">
+          Start Creating
+        </Button>
+      </EmptyContent>
+    )
   }
 
   return (
-    <CredentialForm
+    <ModelConfigForm
       onSubmit={handleSubmit}
-      defaultValues={credentialToFormValues(credential)}
+      defaultValues={modelConfigToFormValues(data)}
       submitLabel="Update"
       config={config}
     />

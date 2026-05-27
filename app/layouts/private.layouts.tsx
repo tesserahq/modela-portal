@@ -27,7 +27,7 @@ export default function PrivateLayout() {
   const navigate = useNavigate()
   const isEditPage = useLocation().pathname.includes('edit')
   const shouldCollapseSidebar =
-    (Boolean(params['credentialID']) ||
+    (Boolean(params['modelConfigID']) ||
       Boolean(params['contextSourceID']) ||
       Boolean(params['mcpServerID'])) &&
     !isEditPage

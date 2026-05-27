@@ -6,36 +6,33 @@ import { useApp } from 'tessera-ui'
 import { EmptyContent } from 'tessera-ui/components'
 import { DetailItemsProps, Layout } from 'tessera-ui/layouts'
 import { useCredential } from '@/resources/hooks/credentials/use-credential'
+import { useModelConfig } from '@/resources/hooks/model-config/use-model-config'
 
-export function loader({ params }: { params: { credentialID: string } }) {
+export function loader({ params }: { params: { modelConfigID: string } }) {
   const apiUrl = process.env.API_URL
   const nodeEnv = process.env.NODE_ENV
 
-  return { apiUrl, nodeEnv, id: params.credentialID }
+  return { apiUrl, nodeEnv, id: params.modelConfigID }
 }
 
-export default function CredentialDetailLayout() {
-  const { apiUrl, nodeEnv } = useLoaderData<typeof loader>()
+export default function ModelConfigDetailLayout() {
+  const { apiUrl, nodeEnv, id } = useLoaderData<typeof loader>()
   const { token } = useApp()
-  const params = useParams()
   const navigate = useNavigate()
+  const params = useParams()
   const { pathname } = useLocation()
 
   const menuItems: DetailItemsProps[] = [
     {
       title: 'Overview',
-      path: `/credentials/${params.credentialID}/overview`,
+      path: `/model-configs/${id}/overview`,
       icon: FileText,
     },
   ]
 
-  const {
-    data: credential,
-    isLoading,
-    error,
-  } = useCredential(
+  const { data, isLoading, error } = useModelConfig(
     { apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv },
-    params.credentialID as string,
+    id,
     { enabled: !!token }
   )
 
@@ -47,15 +44,13 @@ export default function CredentialDetailLayout() {
     token: token ?? undefined,
   })
 
-  const credentialID = params.credentialID
-
-  if (!isLoading && (error || !credential)) {
+  if (!isLoading && (error || !data)) {
     return (
       <EmptyContent
-        title="Credential Not Found"
-        image="/images/empty-credential.png"
-        description={`We can't find credential with ID ${params.credentialID}. ${(error as Error)?.message ?? ''}`}>
-        <Button onClick={() => navigate('/credentials')}>Back to Credentials</Button>
+        title="Oops No Model Config Found"
+        image="/images/empty-data.png"
+        description={`We can't find model config with ID ${id}. ${(error as Error)?.message ?? ''}`}>
+        <Button onClick={() => navigate('/model-configs')}>Back to Listing</Button>
       </EmptyContent>
     )
   }
@@ -64,7 +59,7 @@ export default function CredentialDetailLayout() {
     <Layout.Detail
       menuItems={menuItems}
       breadcrumbs={breadcrumbs}
-      isLoading={breadcrumbs.length === 0 || !token || !credentialID}>
+      isLoading={breadcrumbs.length === 0 || !token || !id}>
       <div className="max-w-screen-2xl mx-auto p-3">
         <Outlet />
       </div>

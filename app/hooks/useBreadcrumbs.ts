@@ -6,6 +6,7 @@ import { IQueryConfig } from '@/resources/queries'
 import { generateBreadcrumbs } from '@/utils/helpers/breadcumb.helper'
 import { getCredential } from '@/resources/queries/credentials/credential.queries'
 import { getMcpServer } from '@/resources/queries/mcp-servers/mcp-server.queries'
+import { getModelConfig } from '@/resources/queries/model-config'
 
 /**
  * Resource state per breadcrumb
@@ -44,6 +45,7 @@ type BreadcrumbQueryConfig = {
 const breadcrumbFetchers = {
   credentialID: (config: IQueryConfig, id: string) => getCredential(config, id),
   mcpServerID: (config: IQueryConfig, id: string) => getMcpServer(config, id),
+  modelConfigID: (config: IQueryConfig, id: string) => getModelConfig(config, id),
 }
 
 export default function useBreadcrumb(config: BreadcrumbConfigType): BreadcrumbItemData[] {

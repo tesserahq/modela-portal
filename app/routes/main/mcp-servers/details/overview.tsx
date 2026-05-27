@@ -82,7 +82,7 @@ export default function McpServerOverview() {
   return (
     <div className="animate-slide-up space-y-5">
       <DetailContent
-        title={mcpServer?.name || ''}
+        title={'MCP Server Detail'}
         actions={
           <Popover>
             <PopoverTrigger asChild>

@@ -69,7 +69,7 @@ export default function CredentialOverview() {
   return (
     <div className="animate-slide-up space-y-5">
       <DetailContent
-        title={credential?.name || ''}
+        title={'Credential Detail'}
         actions={
           <Popover>
             <PopoverTrigger asChild>

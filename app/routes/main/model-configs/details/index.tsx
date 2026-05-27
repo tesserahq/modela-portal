@@ -1,9 +1,9 @@
 import { redirect } from 'react-router'
 
-export async function loader({ params }: { params: { credentialID: string } }) {
-  return redirect(`/credentials/${params.credentialID}/overview`)
+export async function loader({ params }: { params: { modelConfigID: string } }) {
+  return redirect(`/model-configs/${params.modelConfigID}/overview`)
 }
 
-export default function CredentialDetailIndex() {
+export default function ModelConfigDetailIndex() {
   return null
 }

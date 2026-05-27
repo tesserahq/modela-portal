@@ -86,6 +86,17 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             required
             disabled={isEditMode}
           />
+          <Form.Select
+            field="config_type"
+            label="Config Type"
+            placeholder="Select config type"
+            required
+            options={[
+              { label: 'Chat', value: 'chat' },
+              { label: 'Summary', value: 'summary' },
+              { label: 'Generation', value: 'generation' },
+            ]}
+          />
           <Form.ComboBox
             field="system_prompt_id"
             label="System Prompt"
@@ -118,17 +129,7 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             <Form.Input field="top_p" label="Top P" type="number" min={0} max={1} />
             <Form.Input field="max_tool_rounds" label="Max Tool Rounds" type="number" min={0} />
           </div>
-          <Form.Select
-            field="config_type"
-            label="Config Type"
-            placeholder="Select config type"
-            required
-            options={[
-              { label: 'Chat', value: 'chat' },
-              { label: 'Summary', value: 'summary' },
-              { label: 'Generation', value: 'generation' },
-            ]}
-          />
+
           <Form.Switch field="is_default" label="Is Default" />
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => navigate('/model-configs')}>

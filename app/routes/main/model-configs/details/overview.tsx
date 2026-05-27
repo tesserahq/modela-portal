@@ -1,8 +1,7 @@
 import { AppPreloader } from '@/components/loader/pre-loader'
 import { DetailContent } from '@/components/detail-content'
-import { EmptyContent, ResourceID, useApp } from 'tessera-ui'
+import { ResourceID, useApp } from 'tessera-ui'
 import { Popover, PopoverContent, PopoverTrigger } from '@/modules/shadcn/ui/popover'
-import { useCredential, useDeleteCredential } from '@/resources/hooks/credentials/use-credential'
 import { Button } from '@shadcn/ui/button'
 import { Edit, EllipsisVertical, Trash2 } from 'lucide-react'
 import { Activity, useRef } from 'react'
@@ -11,18 +10,20 @@ import { DateTime } from 'tessera-ui/components'
 import DeleteConfirmation, {
   type DeleteConfirmationHandle,
 } from 'tessera-ui/components/delete-confirmation'
-import { getCredentialTypeDisplay } from '@/components/crud-forms/credential-form'
 import Markdown from '@/components/makrdown/markdown'
-import { fieldsForDisplay } from '@/resources/queries/credentials/credential.utils'
+import {
+  useDeleteModelConfig,
+  useModelConfig,
+} from '@/resources/hooks/model-config/use-model-config'
 
-export async function loader({ params }: { params: { credentialID: string } }) {
+export async function loader({ params }: { params: { modelConfigID: string } }) {
   const apiUrl = process.env.API_URL
   const nodeEnv = process.env.NODE_ENV
 
-  return { apiUrl, nodeEnv, id: params.credentialID }
+  return { apiUrl, nodeEnv, id: params.modelConfigID }
 }
 
-export default function CredentialOverview() {
+export default function ModelConfiglOverview() {
   const { apiUrl, nodeEnv, id } = useLoaderData<typeof loader>()
   const params = useParams()
   const { token } = useApp()
@@ -31,23 +32,23 @@ export default function CredentialOverview() {
 
   const config = { apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv }
 
-  const { data: credential, isLoading, error } = useCredential(config, id)
+  const { data, isLoading } = useModelConfig(config, id)
 
-  const { mutateAsync: deleteCredential } = useDeleteCredential(config, {
+  const { mutateAsync: deleteCredential } = useDeleteModelConfig(config, {
     onSuccess: () => {
       deleteConfirmationRef.current?.close()
-      navigate('/credentials')
+      navigate('/model-configs')
     },
   })
 
   const handleDelete = () => {
-    if (!credential) return
+    if (!data) return
     deleteConfirmationRef.current?.open({
-      title: 'Delete Credential',
-      description: `Are you sure you want to delete "${credential.name}"? This action cannot be undone.`,
+      title: 'Delete Model Config',
+      description: `Are you sure you want to delete "${data.name}"? This action cannot be undone.`,
       onDelete: async () => {
         deleteConfirmationRef?.current?.updateConfig({ isLoading: true })
-        await deleteCredential(credential.id)
+        await deleteCredential(data.id)
       },
     })
   }
@@ -56,20 +57,12 @@ export default function CredentialOverview() {
     return <AppPreloader className="min-h-screen" />
   }
 
-  if (error) {
-    return (
-      <EmptyContent
-        image="/images/error.png"
-        title="Failed to get credentials"
-        description={error.message}
-      />
-    )
-  }
+  // Error has been handled in the layout.tsx
 
   return (
     <div className="animate-slide-up space-y-5">
       <DetailContent
-        title={credential?.name || ''}
+        title={'Model Config Detail'}
         actions={
           <Popover>
             <PopoverTrigger asChild>
@@ -81,7 +74,7 @@ export default function CredentialOverview() {
               <Button
                 variant="ghost"
                 className="flex w-full justify-start gap-2"
-                onClick={() => navigate(`/credentials/${params.credentialID}/edit`)}>
+                onClick={() => navigate(`/model-configs/${id}/edit`)}>
                 <Edit size={18} />
                 <span>Edit</span>
               </Button>
@@ -100,41 +93,70 @@ export default function CredentialOverview() {
           <div className="d-item pb-1!">
             <dt className="d-label">ID</dt>
             <dd className="d-content break-all">
-              <ResourceID value={credential?.id || ''} />
+              <ResourceID value={data?.id || ''} />
             </dd>
           </div>
           <div className="d-item pb-1!">
-            <dt className="d-label">Type</dt>
-            <dd className="d-content">
-              {credential?.type ? (
-                <div className="flex items-center gap-1">
-                  {getCredentialTypeDisplay(credential.type).icon}
-                  <span>{getCredentialTypeDisplay(credential.type).displayName}</span>
-                </div>
-              ) : (
-                'N/A'
-              )}
+            <dt className="d-label">Name</dt>
+            <dd className="d-content">{data?.name || 'N/A'}</dd>
+          </div>
+          <div className="d-item pb-1!">
+            <dt className="d-label">Slug</dt>
+            <dd className="d-content">{data?.slug || 'N/A'}</dd>
+          </div>
+          <div className="d-item pb-1!">
+            <dt className="d-label">Provider</dt>
+            <dd className="d-content">{data?.provider || 'N/A'}</dd>
+          </div>
+          <div className="d-item pb-1!">
+            <dt className="d-label">Model</dt>
+            <dd className="d-content">{data?.model || 'N/A'}</dd>
+          </div>
+          <div className="d-item pb-1!">
+            <dt className="d-label">Config Type</dt>
+            <dd className="d-content">{data?.config_type || 'N/A'}</dd>
+          </div>
+          <div className="d-item pb-1!">
+            <dt className="d-label">Default</dt>
+            <dd className="d-content">{data?.is_default ? 'Yes' : 'No'}</dd>
+          </div>
+          <div className="d-item pb-1!">
+            <dt className="d-label">System Prompt ID</dt>
+            <dd className="d-content break-all">
+              <ResourceID value={data?.system_prompt_id || ''} />
             </dd>
           </div>
-          <Activity mode={credential?.fields ? 'visible' : 'hidden'}>
+          <div className="d-item pb-1!">
+            <dt className="d-label">Temperature</dt>
+            <dd className="d-content">{data?.temperature ?? 'N/A'}</dd>
+          </div>
+          <div className="d-item pb-1!">
+            <dt className="d-label">Max Tokens</dt>
+            <dd className="d-content">{data?.max_tokens ?? 'N/A'}</dd>
+          </div>
+          <div className="d-item pb-1!">
+            <dt className="d-label">Top P</dt>
+            <dd className="d-content">{data?.top_p ?? 'N/A'}</dd>
+          </div>
+          <div className="d-item pb-1!">
+            <dt className="d-label">Max Tool Rounds</dt>
+            <dd className="d-content">{data?.max_tool_rounds ?? 'N/A'}</dd>
+          </div>
+          <Activity mode={data?.output_schema ? 'visible' : 'hidden'}>
             <div className="d-item items-start! pb-0! mt-3!">
-              <dt className="d-label">Fields</dt>
+              <dt className="d-label">Output Schema</dt>
               <dd className="d-content">
-                <Markdown>{`\`\`\`json\n${JSON.stringify(fieldsForDisplay(credential?.fields), null, 2)}\n\`\`\``}</Markdown>
+                <Markdown>{`\`\`\`json\n${JSON.stringify(data?.output_schema, null, 2)}\n\`\`\``}</Markdown>
               </dd>
             </div>
           </Activity>
           <div className="d-item">
             <dt className="d-label">Created At</dt>
-            <dd className="d-content">
-              {credential?.created_at && <DateTime date={credential?.created_at} />}
-            </dd>
+            <dd className="d-content">{data?.created_at && <DateTime date={data.created_at} />}</dd>
           </div>
           <div className="d-item">
             <dt className="d-label">Updated At</dt>
-            <dd className="d-content">
-              {credential?.updated_at && <DateTime date={credential?.updated_at} />}
-            </dd>
+            <dd className="d-content">{data?.updated_at && <DateTime date={data.updated_at} />}</dd>
           </div>
         </div>
       </DetailContent>

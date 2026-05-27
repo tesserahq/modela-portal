@@ -1,10 +1,10 @@
 import { isEqual } from '@/utils/helpers/comparison.helper'
 import { ModelConfigFormValue } from './model-config.schema'
 import {
-  CreateModelConfigType,
+  CreateModelConfigData,
   ModelConfigEnum,
   ModelConfigType,
-  UpdateModelConfigType,
+  UpdateModelConfigData,
 } from './model-config.type'
 
 export function modelConfigToFormValues(data: ModelConfigType): ModelConfigFormValue {
@@ -24,7 +24,7 @@ export function modelConfigToFormValues(data: ModelConfigType): ModelConfigFormV
   }
 }
 
-export function formValuesToModelConfig(formValues: ModelConfigFormValue): CreateModelConfigType {
+export function formValuesToModelConfig(formValues: ModelConfigFormValue): CreateModelConfigData {
   const { slug, name, provider, model, ...optional } = formValues
   return {
     slug,
@@ -41,11 +41,11 @@ export function formValuesToModelConfig(formValues: ModelConfigFormValue): Creat
  */
 export function getChangedModelConfigUpdateData(
   original: ModelConfigType,
-  formData: CreateModelConfigType
-): UpdateModelConfigType {
-  const result: UpdateModelConfigType = {}
+  formData: CreateModelConfigData
+): UpdateModelConfigData {
+  const result: UpdateModelConfigData = {}
 
-  const updatableKeys: (keyof UpdateModelConfigType)[] = [
+  const updatableKeys: (keyof UpdateModelConfigData)[] = [
     'name',
     'system_prompt_id',
     'temperature',
