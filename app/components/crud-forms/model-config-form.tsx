@@ -10,7 +10,6 @@ import {
   formValuesToModelConfig,
   ModelConfigFormValue,
   modelConfigSchema,
-  ModelConfigType,
 } from '@/resources/queries/model-config'
 import { useSystemPrompts } from '@/resources/hooks/system-prompt/use-system-prompt'
 import { Badge } from '@/modules/shadcn/ui/badge'
@@ -97,6 +96,8 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
               { label: 'Generation', value: 'generation' },
             ]}
           />
+
+          <Form.Schema field="output_schema" label="Output schema" />
           <Form.ComboBox
             field="system_prompt_id"
             label="System Prompt"
@@ -122,6 +123,8 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             field="system_prompt_id"
             label="System Prompt ID"
             placeholder="Enter system prompt ID"
+            readOnly
+            disabled
           />
           <div className="grid grid-cols-2 gap-4">
             <Form.Input field="temperature" label="Temperature" type="number" min={0} max={2} />

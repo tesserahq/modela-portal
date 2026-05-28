@@ -1,7 +1,3 @@
-import { CredentialForm } from '@/components/crud-forms/credential-form'
-import { useCreateCredential } from '@/resources/hooks/credentials/use-credential'
-import { credentialFormDefaultValue } from '@/resources/queries/credentials/credential.schema'
-import { CredentialFormData } from '@/resources/queries/credentials/credential.type'
 import { IQueryConfig } from '@/resources/queries'
 import { useLoaderData, useNavigate } from 'react-router'
 import { useApp } from 'tessera-ui'
@@ -26,7 +22,10 @@ export default function NewModelConfig() {
 
   const { mutateAsync: createModelConfig } = useCreateModelConfig(config, {
     onSuccess: (data) => {
-      navigate(`/credentials/${data.id}`)
+      navigate(`/model-configs/${data.id}`)
+    },
+    onError(error) {
+      console.log('ERROR', error)
     },
   })
 

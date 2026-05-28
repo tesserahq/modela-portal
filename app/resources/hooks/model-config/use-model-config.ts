@@ -106,6 +106,7 @@ export function useCreateModelConfig(
 
         return await createModelConfig(config, data)
       } catch (error: any) {
+        console.log('ERROR HOOK', error)
         throw new QueryError(error)
       }
     },

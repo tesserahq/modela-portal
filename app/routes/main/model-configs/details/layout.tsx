@@ -1,6 +1,6 @@
 import useBreadcrumb from '@/hooks/useBreadcrumbs'
 import { Button } from '@/modules/shadcn/ui/button'
-import { FileText } from 'lucide-react'
+import { FileText, Server } from 'lucide-react'
 import { Outlet, useLoaderData, useLocation, useNavigate, useParams } from 'react-router'
 import { useApp } from 'tessera-ui'
 import { EmptyContent } from 'tessera-ui/components'
@@ -27,6 +27,11 @@ export default function ModelConfigDetailLayout() {
       title: 'Overview',
       path: `/model-configs/${id}/overview`,
       icon: FileText,
+    },
+    {
+      title: 'MCP Servers',
+      path: `/model-configs/${id}/mcp-servers`,
+      icon: Server,
     },
   ]
 
