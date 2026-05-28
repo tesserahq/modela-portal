@@ -6,11 +6,15 @@ import {
   getModelConfigs,
   ModelConfigType,
   UpdateModelConfigData,
-} from '@/resources/queries/model-config'
-import {
   createModelConfig,
   deleteModelConfig,
   updateModelConfig,
+  getModelConfigMCPServer,
+  AttachModelConfigMCPServerData,
+} from '@/resources/queries/model-config'
+import {
+  createModelConfigMCPServer,
+  deleteModelConfigMCPServer,
 } from '@/resources/queries/model-config/model-config.queries'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'tessera-ui/components'
@@ -34,6 +38,9 @@ export const contextSourceQueryKeys = {
     [...contextSourceQueryKeys.lists(), config, params] as const,
   details: () => [...contextSourceQueryKeys.all, 'detail'] as const,
   detail: (id: string) => [...contextSourceQueryKeys.details(), id] as const,
+  mcpServers: () => [...contextSourceQueryKeys.all, 'mcp-servers'] as const,
+  mcpServersList: (id: string, params: IQueryParams) =>
+    [...contextSourceQueryKeys.mcpServers(), id, params] as const,
 }
 
 export function useModelConfigs(
@@ -106,7 +113,6 @@ export function useCreateModelConfig(
 
         return await createModelConfig(config, data)
       } catch (error: any) {
-        console.log('ERROR HOOK', error)
         throw new QueryError(error)
       }
     },
@@ -185,6 +191,100 @@ export function useDeleteModelConfig(
     },
     onError: (error: Error) => {
       toast.error('Failed to delete model config', { description: error.message })
+      options?.onError?.(error)
+    },
+  })
+}
+
+export function useModelConfigMCPServers(
+  config: IQueryConfig,
+  params: IQueryParams,
+  id: string,
+  options?: {
+    enabled?: boolean
+    staleTime?: number
+  }
+) {
+  return useQuery({
+    queryKey: contextSourceQueryKeys.mcpServersList(id, params),
+    queryFn: async () => {
+      try {
+        if (!config.token) {
+          throw new QueryError('Token is required', 'TOKEN_REQUIRED')
+        }
+
+        return await getModelConfigMCPServer(config, params, id)
+      } catch (error: any) {
+        throw new QueryError(error)
+      }
+    },
+    staleTime: options?.staleTime || 5 * 60 * 1000,
+    enabled: options?.enabled !== false && !!config.token,
+  })
+}
+
+export function useAttachModelConfigMCPServer(
+  config: IQueryConfig,
+  id: string,
+  options?: {
+    onSuccess?: (data: string) => void
+    onError?: (error: Error) => void
+  }
+) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async (data: AttachModelConfigMCPServerData) => {
+      try {
+        if (!config.token) {
+          throw new QueryError('Token is required', 'TOKEN_REQUIRED')
+        }
+
+        return await createModelConfigMCPServer(config, id, data)
+      } catch (error: any) {
+        throw new QueryError(error)
+      }
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
+      toast.success('MCP Server attached successfully', { duration: 3000 })
+      options?.onSuccess?.(data)
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to attach MCP Server', { description: error.message })
+      options?.onError?.(error)
+    },
+  })
+}
+
+export function useDetachModelConfigMCPServer(
+  config: IQueryConfig,
+  options?: {
+    onSuccess?: () => void
+    onError?: (error: QueryError) => void
+  }
+) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, serverID }: { id: string; serverID: string }) => {
+      try {
+        if (!config.token) {
+          throw new QueryError('Token is required', 'TOKEN_REQUIRED')
+        }
+
+        return await deleteModelConfigMCPServer(config, id, serverID)
+      } catch (error: any) {
+        throw new QueryError(error)
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.mcpServers() })
+      toast.success('MCP Server detached successfully', { duration: 3000 })
+      options?.onSuccess?.()
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to detached MCP Server', { description: error.message })
       options?.onError?.(error)
     },
   })

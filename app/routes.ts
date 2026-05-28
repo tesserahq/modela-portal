@@ -36,6 +36,8 @@ export default [
       route(':modelConfigID', 'routes/main/model-configs/details/layout.tsx', [
         index('routes/main/model-configs/details/index.tsx'),
         route('overview', 'routes/main/model-configs/details/overview.tsx'),
+        route('mcp-servers', 'routes/main/model-configs/details/mcp-servers/index.tsx'),
+        route('mcp-servers/new', 'routes/main/model-configs/details/mcp-servers/new.tsx'),
       ]),
     ]),
   ]),

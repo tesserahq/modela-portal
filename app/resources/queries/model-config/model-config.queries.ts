@@ -1,7 +1,13 @@
 import { fetchApi } from '@/libraries/fetch'
 import { IPaging } from '@/resources/types'
 import { IQueryConfig, IQueryParams } from '..'
-import { CreateModelConfigData, ModelConfigType, UpdateModelConfigData } from './model-config.type'
+import {
+  CreateModelConfigData,
+  AttachModelConfigMCPServerData,
+  ModelConfigType,
+  UpdateModelConfigData,
+} from './model-config.type'
+import { McpServerType } from '../mcp-servers/mcp-server.type'
 
 const RESOURCE_URL = '/model-configs'
 
@@ -63,6 +69,49 @@ export async function deleteModelConfig(config: IQueryConfig, id: string): Promi
   const { apiUrl, token, nodeEnv } = config
 
   await fetchApi(`${apiUrl}${RESOURCE_URL}/${id}`, token, nodeEnv, {
+    method: 'DELETE',
+  })
+}
+
+export async function getModelConfigMCPServer(
+  config: IQueryConfig,
+  params: IQueryParams,
+  id: string
+): Promise<IPaging<McpServerType>> {
+  const { apiUrl, token, nodeEnv } = config
+  const { page, size } = params
+
+  const res = await fetchApi(`${apiUrl}${RESOURCE_URL}/${id}/mcp-servers`, token, nodeEnv, {
+    method: 'GET',
+    pagination: { page, size },
+  })
+
+  return res as IPaging<McpServerType>
+}
+
+export async function createModelConfigMCPServer(
+  config: IQueryConfig,
+  id: string,
+  data: AttachModelConfigMCPServerData
+): Promise<string> {
+  const { apiUrl, token, nodeEnv } = config
+
+  const res = await fetchApi(`${apiUrl}${RESOURCE_URL}/${id}/mcp-servers`, token, nodeEnv, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+
+  return res as string
+}
+
+export async function deleteModelConfigMCPServer(
+  config: IQueryConfig,
+  id: string,
+  serverID: string
+): Promise<void> {
+  const { apiUrl, token, nodeEnv } = config
+
+  await fetchApi(`${apiUrl}${RESOURCE_URL}/${id}/mcp-servers/${serverID}`, token, nodeEnv, {
     method: 'DELETE',
   })
 }

@@ -24,9 +24,6 @@ export default function NewModelConfig() {
     onSuccess: (data) => {
       navigate(`/model-configs/${data.id}`)
     },
-    onError(error) {
-      console.log('ERROR', error)
-    },
   })
 
   const handleSubmit = async (data: ModelConfigFormData): Promise<void> => {

@@ -3,6 +3,7 @@ export type {
   ModelConfigType,
   UpdateModelConfigData,
   ModelConfigEnum,
+  AttachModelConfigMCPServerData,
 } from './model-config.type'
 export {
   modelConfigToFormValues,
@@ -13,5 +14,15 @@ export {
   type ModelConfigFormValue,
   modelConfigSchema,
   modelConfigFormDefaultValue,
+  modelConfigMCPServerSchema,
+  modelConfigMCPServerFormDefaultValue,
+  type ModelConfigMCPServerFormValue,
 } from './model-config.schema'
-export { getModelConfigs, getModelConfig } from './model-config.queries'
+export {
+  getModelConfigs,
+  getModelConfig,
+  createModelConfig,
+  getModelConfigMCPServer,
+  deleteModelConfig,
+  updateModelConfig,
+} from './model-config.queries'

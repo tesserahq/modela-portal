@@ -15,6 +15,7 @@ import {
   useDeleteModelConfig,
   useModelConfig,
 } from '@/resources/hooks/model-config/use-model-config'
+import { Badge } from '@/modules/shadcn/ui/badge'
 
 export async function loader({ params }: { params: { modelConfigID: string } }) {
   const apiUrl = process.env.API_URL
@@ -118,7 +119,17 @@ export default function ModelConfiglOverview() {
           </div>
           <div className="d-item pb-1!">
             <dt className="d-label">Default</dt>
-            <dd className="d-content">{data?.is_default ? 'Yes' : 'No'}</dd>
+            <dd className="d-content">
+              {data?.is_default ? (
+                <Badge variant="outline" className="border border-green-500 text-green-600">
+                  <span className="text-xs">Yes</span>
+                </Badge>
+              ) : (
+                <Badge variant="outline" className="border border-red-500 text-red-600">
+                  <span className="text-xs">No</span>
+                </Badge>
+              )}
+            </dd>
           </div>
           <div className="d-item pb-1!">
             <dt className="d-label">System Prompt ID</dt>

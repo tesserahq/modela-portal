@@ -31,3 +31,13 @@ export const modelConfigFormDefaultValue: ModelConfigFormValue = {
   is_default: false,
   max_tool_rounds: 1,
 }
+
+export const modelConfigMCPServerSchema = z.object({
+  server_id: z.string().min(1, 'Server ID is required'),
+})
+
+export type ModelConfigMCPServerFormValue = z.infer<typeof modelConfigMCPServerSchema>
+
+export const modelConfigMCPServerFormDefaultValue: ModelConfigMCPServerFormValue = {
+  server_id: '',
+}

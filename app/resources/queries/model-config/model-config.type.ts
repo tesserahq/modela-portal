@@ -50,3 +50,10 @@ export type UpdateModelConfigData = Partial<
  * Model config form data (for form submission)
  */
 export type ModelConfigFormData = CreateModelConfigData
+
+/**
+ * Model config connect mcp server
+ */
+export type AttachModelConfigMCPServerData = {
+  server_id: string
+}
