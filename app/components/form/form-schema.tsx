@@ -10,6 +10,7 @@ interface FormSchemaMapProps {
   required?: boolean
   description?: string
   useJsonEditor?: boolean
+  useSingleInput?: boolean
 }
 
 export function FormSchemaMap({
@@ -18,19 +19,34 @@ export function FormSchemaMap({
   required,
   description,
   useJsonEditor = false,
+  useSingleInput = false,
 }: FormSchemaMapProps) {
   const { form } = useFormContext()
-  const [newKey, setNewKey] = useState('')
-  const [newValue, setNewValue] = useState('') // only used when !useJsonEditor
-  const [keyError, setKeyError] = useState<string | null>(null)
-  const [entryValues, setEntryValues] = useState<Record<string, string>>({}) // only used when useJsonEditor
 
+  const [newKey, setNewKey] = useState('')
+  const [newValue, setNewValue] = useState('')
+  const [keyError, setKeyError] = useState<string | null>(null)
+
+  const [jsonValue, setJsonValue] = useState<string>(() => {
+    const initial = form.getValues(field) ?? {}
+    return JSON.stringify(initial, null, 2)
+  })
   const formValue: Record<string, unknown> = form.watch(field) ?? {}
   const entries = Object.keys(formValue)
 
   const handleAdd = () => {
-    const trimmedKey = newKey.trim()
-    const trimmedValue = newValue.trim()
+    let trimmedKey = newKey.trim()
+    let trimmedValue = newValue.trim()
+
+    if (useSingleInput) {
+      const eqIndex = newKey.indexOf('=')
+      if (eqIndex === -1) {
+        setKeyError('Format must be key=value')
+        return
+      }
+      trimmedKey = newKey.substring(0, eqIndex).trim()
+      trimmedValue = newKey.substring(eqIndex + 1).trim()
+    }
 
     if (!trimmedKey) {
       setKeyError('Key cannot be empty')
@@ -45,12 +61,7 @@ export function FormSchemaMap({
       return
     }
 
-    if (useJsonEditor) {
-      form.setValue(field, { ...formValue, [trimmedKey]: {} }, { shouldValidate: true })
-      setEntryValues((prev) => ({ ...prev, [trimmedKey]: '{}' }))
-    } else {
-      form.setValue(field, { ...formValue, [trimmedKey]: trimmedValue }, { shouldValidate: true })
-    }
+    form.setValue(field, { ...formValue, [trimmedKey]: trimmedValue }, { shouldValidate: true })
 
     setNewKey('')
     setNewValue('')
@@ -61,14 +72,6 @@ export function FormSchemaMap({
     const next = { ...formValue }
     delete next[key]
     form.setValue(field, next, { shouldValidate: true })
-
-    if (useJsonEditor) {
-      setEntryValues((prev) => {
-        const next = { ...prev }
-        delete next[key]
-        return next
-      })
-    }
   }
 
   const handlePlainValueChange = (key: string, val: string) => {
@@ -82,6 +85,9 @@ export function FormSchemaMap({
     }
   }
 
+  const inputClassName =
+    'h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring'
+
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-1">
@@ -93,12 +99,31 @@ export function FormSchemaMap({
 
       {description && <p className="text-xs text-muted-foreground">{description}</p>}
 
-      {/* existing entries */}
-      {entries.map((key) =>
-        useJsonEditor ? (
-          <div key={key} className="flex flex-col gap-1.5 rounded-md border border-border p-2">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-mono font-medium">{key}</span>
+      {useJsonEditor ? (
+        <JsonEditor
+          value={jsonValue}
+          onChange={setJsonValue}
+          onValidChange={(parsed) => form.setValue(field, parsed, { shouldValidate: true })}
+          minHeight={200}
+          onClear={() => form.setValue(field, {}, { shouldValidate: true })}
+        />
+      ) : (
+        <>
+          {entries.map((key) => (
+            <div key={key} className="flex items-center gap-2">
+              <input
+                value={key}
+                readOnly
+                className="h-9 w-2/5 rounded-md border border-input bg-muted px-3 text-sm font-mono
+                  text-muted-foreground"
+              />
+              <span className="text-muted-foreground text-sm">=</span>
+              <input
+                value={formValue[key] as string}
+                onChange={(e) => handlePlainValueChange(key, e.target.value)}
+                placeholder="Value"
+                className={inputClassName}
+              />
               <button
                 type="button"
                 onClick={() => handleRemove(key)}
@@ -107,72 +132,49 @@ export function FormSchemaMap({
                 <Trash2 size={13} />
               </button>
             </div>
-            <JsonEditor
-              value={entryValues[key] ?? '{}'}
-              onChange={(raw) => setEntryValues((prev) => ({ ...prev, [key]: raw }))}
-              onValidChange={(parsed) =>
-                form.setValue(field, { ...formValue, [key]: parsed }, { shouldValidate: true })
-              }
-              minHeight={120}
-            />
+          ))}
+
+          <div className="flex gap-2">
+            {useSingleInput ? (
+              <input
+                value={newKey}
+                onChange={(e) => {
+                  setNewKey(e.target.value)
+                  setKeyError(null)
+                }}
+                onKeyDown={handleKeyDown}
+                placeholder="key=value"
+                className={inputClassName}
+              />
+            ) : (
+              <>
+                <input
+                  value={newKey}
+                  onChange={(e) => {
+                    setNewKey(e.target.value)
+                    setKeyError(null)
+                  }}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Property name"
+                  className={inputClassName}
+                />
+                <input
+                  value={newValue}
+                  onChange={(e) => setNewValue(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Value"
+                  className={inputClassName}
+                />
+              </>
+            )}
+            <Button type="button" variant="outline" size="sm" onClick={handleAdd}>
+              Add
+            </Button>
           </div>
-        ) : (
-          <div key={key} className="flex items-center gap-2">
-            <input
-              value={key}
-              readOnly
-              className="h-9 w-2/5 rounded-md border border-input bg-muted px-3 text-sm font-mono
-                text-muted-foreground"
-            />
-            <span className="text-muted-foreground text-sm">:</span>
-            <input
-              value={formValue[key] as string}
-              onChange={(e) => handlePlainValueChange(key, e.target.value)}
-              placeholder="Value"
-              className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm
-                font-mono focus:outline-none focus:ring-1 focus:ring-ring"
-            />
-            <button
-              type="button"
-              onClick={() => handleRemove(key)}
-              className="text-muted-foreground hover:text-destructive transition-colors"
-              aria-label={`Remove ${key}`}>
-              <Trash2 size={13} />
-            </button>
-          </div>
-        )
+
+          {keyError && <p className="text-xs text-destructive">{keyError}</p>}
+        </>
       )}
-
-      {/* add row */}
-      <div className="flex gap-2">
-        <input
-          value={newKey}
-          onChange={(e) => {
-            setNewKey(e.target.value)
-            setKeyError(null)
-          }}
-          onKeyDown={handleKeyDown}
-          placeholder="Property name"
-          className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm font-mono
-            placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
-        />
-        {!useJsonEditor && (
-          <input
-            value={newValue}
-            onChange={(e) => setNewValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Value"
-            className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm
-              font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-1
-              focus:ring-ring"
-          />
-        )}
-        <Button type="button" variant="outline" size="sm" onClick={handleAdd}>
-          Add
-        </Button>
-      </div>
-
-      {keyError && <p className="text-xs text-destructive">{keyError}</p>}
     </div>
   )
 }

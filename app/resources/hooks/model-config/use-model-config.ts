@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { IQueryConfig, IQueryParams } from '@/resources/queries'
 import {
-  CreateModelConfigData,
+  ModelConfigData,
   getModelConfig,
   getModelConfigs,
   ModelConfigType,
@@ -105,7 +105,7 @@ export function useCreateModelConfig(
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: async (data: CreateModelConfigData) => {
+    mutationFn: async (data: ModelConfigData) => {
       try {
         if (!config.token) {
           throw new QueryError('Token is required', 'TOKEN_REQUIRED')
@@ -246,7 +246,7 @@ export function useAttachModelConfigMCPServer(
       }
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.mcpServers() })
       toast.success('MCP Server attached successfully', { duration: 3000 })
       options?.onSuccess?.(data)
     },

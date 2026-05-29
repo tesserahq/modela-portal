@@ -82,23 +82,17 @@ export function ModelConfigMCPServerForm({
             label="MCP Server"
             placeholder="Search available MCP Server..."
             options={mcpServers?.items ?? []}
-            getOptionId={(p) => p.server_id}
+            getOptionId={(p) => p.id}
             getOptionLabel={(p) => p.name}
             getSearchValue={(p) => `${p.name} ${p.id}`}
             renderOption={(p) => (
               <div className="flex flex-col">
                 <span className="font-medium">{p.name}</span>
-                <span className="text-muted-foreground text-xs">{p.server_id}</span>
+                <span className="text-muted-foreground text-xs">{p.url}</span>
               </div>
             )}
             isLoading={isLoading}
-          />
-          <Form.Input
-            field="server_id"
-            label="Server ID"
-            placeholder="Select available MCP Server above"
-            readOnly
-            disabled
+            required
           />
 
           <div className="flex justify-end gap-2">

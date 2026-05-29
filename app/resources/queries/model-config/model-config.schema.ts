@@ -5,7 +5,7 @@ export const modelConfigSchema = z.object({
   name: z.string().min(1, 'Name is required').max(255),
   provider: z.string().min(1, 'Provider is required').max(100),
   model: z.string().min(1, 'Model is required').max(255),
-  system_prompt_id: z.string().optional(),
+  system_prompt_id: z.string().optional().nullable(),
   temperature: z.coerce.number().min(0).max(2).optional(),
   max_tokens: z.coerce.number().int().positive().optional(),
   top_p: z.coerce.number().min(0).max(1).optional(),

@@ -194,9 +194,9 @@ export function FormComboBox<T>({
           <FormControl>
             <ComboBoxSelect
               {...comboBoxProps}
-              value={fieldProps.value ?? ''}
+              value={fieldProps.value ?? null}
               onChange={(option) =>
-                fieldProps.onChange(option ? comboBoxProps.getOptionId(option) : '')
+                fieldProps.onChange(option ? comboBoxProps.getOptionId(option) : null)
               }
               disabled={disabled}
               required={required}

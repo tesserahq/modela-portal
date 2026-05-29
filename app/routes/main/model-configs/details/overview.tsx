@@ -26,7 +26,6 @@ export async function loader({ params }: { params: { modelConfigID: string } }) 
 
 export default function ModelConfiglOverview() {
   const { apiUrl, nodeEnv, id } = useLoaderData<typeof loader>()
-  const params = useParams()
   const { token } = useApp()
   const navigate = useNavigate()
   const deleteConfirmationRef = useRef<DeleteConfirmationHandle>(null)
@@ -131,13 +130,7 @@ export default function ModelConfiglOverview() {
               )}
             </dd>
           </div>
-          <div className="d-item pb-1!">
-            <dt className="d-label">System Prompt ID</dt>
-            <dd className="d-content break-all">
-              <ResourceID value={data?.system_prompt_id || ''} />
-            </dd>
-          </div>
-          <div className="d-item pb-1!">
+          {/* <div className="d-item pb-1!">
             <dt className="d-label">Temperature</dt>
             <dd className="d-content">{data?.temperature ?? 'N/A'}</dd>
           </div>
@@ -152,12 +145,21 @@ export default function ModelConfiglOverview() {
           <div className="d-item pb-1!">
             <dt className="d-label">Max Tool Rounds</dt>
             <dd className="d-content">{data?.max_tool_rounds ?? 'N/A'}</dd>
-          </div>
-          <Activity mode={data?.output_schema ? 'visible' : 'hidden'}>
+          </div> */}
+          <Activity
+            mode={
+              data?.output_schema && Object.keys(data.output_schema).length > 0
+                ? 'visible'
+                : 'hidden'
+            }>
             <div className="d-item items-start! pb-0! mt-3!">
               <dt className="d-label">Output Schema</dt>
-              <dd className="d-content">
-                <Markdown>{`\`\`\`json\n${JSON.stringify(data?.output_schema, null, 2)}\n\`\`\``}</Markdown>
+              <dd className="d-content flex-1">
+                <Markdown
+                  className="flex-1 w-full"
+                  valueToCopy={
+                    data?.output_schema
+                  }>{`\`\`\`json\n${JSON.stringify(data?.output_schema, null, 2)}\n\`\`\``}</Markdown>
               </dd>
             </div>
           </Activity>
@@ -171,6 +173,33 @@ export default function ModelConfiglOverview() {
           </div>
         </div>
       </DetailContent>
+
+      <Activity mode={data?.system_prompt_id ? 'visible' : 'hidden'}>
+        <DetailContent title={'System Prompt'}>
+          <div className="d-list">
+            <div className="d-item">
+              <dt className="d-label">ID</dt>
+              <dd className="d-content">
+                <ResourceID value={data?.system_prompt_id || ''} />
+              </dd>
+            </div>
+            <div className="d-item">
+              <dt className="d-label">Name</dt>
+              <dd className="d-content">{data?.system_prompt.name || 'N/A'}</dd>
+            </div>
+            <Activity mode={data?.system_prompt.content ? 'visible' : 'hidden'}>
+              <div className="d-item mb-7">
+                <dt className="d-label">Content</dt>
+              </div>
+            </Activity>
+          </div>
+          <Activity mode={data?.system_prompt.content ? 'visible' : 'hidden'}>
+            <DetailContent title={''}>
+              <Markdown>{data?.system_prompt.content ?? '-'}</Markdown>
+            </DetailContent>
+          </Activity>
+        </DetailContent>
+      </Activity>
 
       <DeleteConfirmation ref={deleteConfirmationRef} />
     </div>

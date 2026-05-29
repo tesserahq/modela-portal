@@ -6,7 +6,7 @@ import { FormLayout } from '../form/form-layout'
 import { useNavigate } from 'react-router'
 import { IQueryConfig } from '@/resources/queries'
 import {
-  CreateModelConfigData,
+  ModelConfigData,
   formValuesToModelConfig,
   ModelConfigFormValue,
   modelConfigSchema,
@@ -17,7 +17,7 @@ import { Badge } from '@/modules/shadcn/ui/badge'
 interface Props {
   config: IQueryConfig
   defaultValues: ModelConfigFormValue
-  onSubmit: (data: CreateModelConfigData) => void | Promise<void>
+  onSubmit: (data: ModelConfigData) => void | Promise<void>
   submitLabel?: string
 }
 
@@ -31,16 +31,6 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
     page: 1,
     size: 100,
   })
-
-  const schema = useMemo(() => {
-    return isEditMode
-      ? modelConfigSchema.omit({
-          slug: true,
-          provider: true,
-          model: true,
-        })
-      : modelConfigSchema
-  }, [isEditMode])
 
   const handleSubmit = async (
     data: ModelConfigFormValue | Omit<ModelConfigFormValue, 'slug' | 'provider' | 'model'>
@@ -57,7 +47,7 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
   return (
     <div className="pt-5">
       <Form
-        schema={schema}
+        schema={modelConfigSchema}
         defaultValues={defaultValues}
         onSubmit={handleSubmit}
         mode="onChange"
@@ -76,15 +66,16 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             label="Provider"
             placeholder="Enter provider"
             required
-            disabled={isEditMode}
+            // disabled={isEditMode}
           />
           <Form.Input
             field="model"
             label="Model"
             placeholder="Enter model"
             required
-            disabled={isEditMode}
+            // disabled={isEditMode}
           />
+          <Form.Switch field="is_default" label="Is Default" />
           <Form.Select
             field="config_type"
             label="Config Type"
@@ -96,8 +87,6 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
               { label: 'Generation', value: 'generation' },
             ]}
           />
-
-          <Form.Schema field="output_schema" label="Output schema" />
           <Form.ComboBox
             field="system_prompt_id"
             label="System Prompt"
@@ -107,19 +96,17 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             getOptionLabel={(p) => `${p.name} v.${p.current_version.version_number}`}
             getSearchValue={(p) => `${p.name} ${p.id}`}
             renderOption={(p) => (
-              <div className="flex flex-col">
-                <div className="flex space-x-3">
-                  <span className="font-medium">{p.name}</span>
-                  <Badge variant="outline" className="border border-green-500 text-green-600 py-0">
-                    <span className="text-xs">v.{p.current_version.version_number}</span>
-                  </Badge>
-                </div>
-                <span className="text-muted-foreground text-xs">{p.id}</span>
+              <div className="flex space-x-3">
+                <span className="font-medium">{p.name}</span>
+                <Badge variant="outline" className="border border-green-500 text-green-600 py-0">
+                  <span className="text-xs">v.{p.current_version.version_number}</span>
+                </Badge>
               </div>
             )}
             isLoading={isLoading}
           />
-          <Form.Input
+          <Form.Schema field="output_schema" label="Output schema" useJsonEditor useSingleInput />
+          {/* <Form.Input
             field="system_prompt_id"
             label="System Prompt ID"
             placeholder="Enter system prompt ID"
@@ -131,9 +118,8 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             <Form.Input field="max_tokens" label="Max Tokens" type="number" min={1} />
             <Form.Input field="top_p" label="Top P" type="number" min={0} max={1} />
             <Form.Input field="max_tool_rounds" label="Max Tool Rounds" type="number" min={0} />
-          </div>
+          </div> */}
 
-          <Form.Switch field="is_default" label="Is Default" />
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => navigate('/model-configs')}>
               Cancel

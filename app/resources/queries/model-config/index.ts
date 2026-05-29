@@ -1,5 +1,5 @@
 export type {
-  CreateModelConfigData,
+  ModelConfigData,
   ModelConfigType,
   UpdateModelConfigData,
   ModelConfigEnum,

@@ -8,7 +8,7 @@ export type ModelConfigType = {
   name: string
   provider: string
   model: string
-  system_prompt_id: string
+  system_prompt_id: string | null
   temperature: number
   max_tokens: number
   top_p: number
@@ -19,12 +19,17 @@ export type ModelConfigType = {
   id: string
   created_at: string
   updated_at: string
+  system_prompt: {
+    id: string
+    name: string
+    content: string
+  }
 }
 
 /**
- * Create model config data (POST body)
+ *  Model config data (POST body)
  */
-export type CreateModelConfigData = Pick<ModelConfigType, 'slug' | 'name' | 'provider' | 'model'> &
+export type ModelConfigData = Pick<ModelConfigType, 'slug' | 'name' | 'provider' | 'model'> &
   Partial<
     Pick<
       ModelConfigType,
@@ -42,14 +47,12 @@ export type CreateModelConfigData = Pick<ModelConfigType, 'slug' | 'name' | 'pro
 /**
  * Update model config data (PATCH body, all fields optional)
  */
-export type UpdateModelConfigData = Partial<
-  Omit<CreateModelConfigData, 'slug' | 'provider' | 'model'>
->
+export type UpdateModelConfigData = Partial<Omit<ModelConfigData, 'slug'>>
 
 /**
  * Model config form data (for form submission)
  */
-export type ModelConfigFormData = CreateModelConfigData
+export type ModelConfigFormData = ModelConfigData
 
 /**
  * Model config connect mcp server

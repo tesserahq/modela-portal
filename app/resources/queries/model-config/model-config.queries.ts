@@ -2,7 +2,7 @@ import { fetchApi } from '@/libraries/fetch'
 import { IPaging } from '@/resources/types'
 import { IQueryConfig, IQueryParams } from '..'
 import {
-  CreateModelConfigData,
+  ModelConfigData,
   AttachModelConfigMCPServerData,
   ModelConfigType,
   UpdateModelConfigData,
@@ -38,7 +38,7 @@ export async function getModelConfig(config: IQueryConfig, id: string): Promise<
 
 export async function createModelConfig(
   config: IQueryConfig,
-  data: CreateModelConfigData
+  data: ModelConfigData
 ): Promise<ModelConfigType> {
   const { apiUrl, token, nodeEnv } = config
 

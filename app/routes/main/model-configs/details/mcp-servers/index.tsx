@@ -48,7 +48,7 @@ export default function ModelConfigMcpServersIndex() {
 
   const config = { apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv }
 
-  const { data, isLoading, error } = useModelConfigMCPServers(
+  const { data, isLoading, error, isFetching } = useModelConfigMCPServers(
     config,
     { page: pagination.page, size: pagination.size },
     id,
@@ -70,7 +70,7 @@ export default function ModelConfigMcpServersIndex() {
       description: `Are you sure you want to detach "${server.name}"? This action cannot be undone.`,
       onDelete: async () => {
         deleteConfirmationRef?.current?.updateConfig({ isLoading: true })
-        await detachMcpServer({ id, serverID: server.server_id })
+        await detachMcpServer({ id, serverID: server.id })
       },
     })
   }
@@ -192,7 +192,7 @@ export default function ModelConfigMcpServersIndex() {
                   aria-label="Detach MCP server"
                   tabIndex={0}>
                   <Unlink size={18} />
-                  <span>Delete</span>
+                  <span>Detach</span>
                 </Button>
               </PopoverContent>
             </Popover>
@@ -203,7 +203,7 @@ export default function ModelConfigMcpServersIndex() {
     [navigate]
   )
 
-  if (isLoading || isLoadingIdenties) {
+  if (isLoading || isLoadingIdenties || isFetching) {
     return <AppPreloader />
   }
 

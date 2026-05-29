@@ -15,13 +15,13 @@ class QueryError extends Error {
   }
 }
 
-export const contextSourceQueryKeys = {
+export const systemPromptQueryKeys = {
   all: ['system-prompt'] as const,
-  lists: () => [...contextSourceQueryKeys.all, 'list'] as const,
+  lists: () => [...systemPromptQueryKeys.all, 'list'] as const,
   list: (config: IQueryConfig, params: IQueryParams) =>
-    [...contextSourceQueryKeys.lists(), config, params] as const,
-  details: () => [...contextSourceQueryKeys.all, 'detail'] as const,
-  detail: (id: string) => [...contextSourceQueryKeys.details(), id] as const,
+    [...systemPromptQueryKeys.lists(), config, params] as const,
+  details: () => [...systemPromptQueryKeys.all, 'detail'] as const,
+  detail: (id: string) => [...systemPromptQueryKeys.details(), id] as const,
 }
 
 export function useSystemPrompts(
@@ -33,7 +33,7 @@ export function useSystemPrompts(
   }
 ) {
   return useQuery({
-    queryKey: contextSourceQueryKeys.list(config, params),
+    queryKey: systemPromptQueryKeys.list(config, params),
     queryFn: async () => {
       try {
         if (!config.token) {
