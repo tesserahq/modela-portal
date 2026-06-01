@@ -72,12 +72,17 @@ export async function deleteCredential(config: IQueryConfig, id: string): Promis
   })
 }
 
-export async function getCredentialTypes(config: IQueryConfig): Promise<CredentialTypes[]> {
+export async function getCredentialTypes(
+  config: IQueryConfig,
+  params?: IQueryParams
+): Promise<IPaging<CredentialTypes>> {
   const { apiUrl, token, nodeEnv } = config
+  const { page = 1, size = 100 } = params ?? {}
 
   const types = await fetchApi(`${apiUrl}${CREDENTIALS_ENDPOINT}/types`, token, nodeEnv, {
     method: 'GET',
+    pagination: { page, size },
   })
 
-  return types as CredentialTypes[]
+  return types as IPaging<CredentialTypes>
 }

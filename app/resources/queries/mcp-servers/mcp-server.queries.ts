@@ -54,7 +54,7 @@ export async function updateMcpServer(
   const { apiUrl, token, nodeEnv } = config
 
   const server = await fetchApi(`${apiUrl}${MCP_SERVERS_ENDPOINT}/${id}`, token, nodeEnv, {
-    method: 'PUT',
+    method: 'PATCH',
     body: JSON.stringify(data),
   })
 

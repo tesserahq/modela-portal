@@ -1,17 +1,57 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { JSX, Suspense, useEffect, useState } from 'react'
+import React, { JSX, Suspense, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 import { cn } from '@shadcn/lib/utils'
+import { HighlightedPre } from './highlighted-pre'
+import { Check, Copy } from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/modules/shadcn/ui/tooltip'
+import { Button } from '@/modules/shadcn/ui/button'
 
 interface MarkdownProps {
   children: string
+  className?: string
+  valueToCopy?: any
 }
 
-export function Markdown({ children }: MarkdownProps) {
+export function Markdown({ children, className, valueToCopy }: MarkdownProps) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(children)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
   return (
-    <div className="space-y-3">
+    <div className={cn('relative group space-y-3', className)}>
+      {valueToCopy && (
+        <div className="absolute top-2 right-2 z-50">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  className="h-6 w-6 p-0 ml-1"
+                  onClick={handleCopy}
+                  aria-label="Copy resource id">
+                  {copied ? <Check /> : <Copy />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="top">
+                <span>Copy</span>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      )}
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         components={COMPONENTS as import('react-markdown').Components}>
@@ -20,81 +60,6 @@ export function Markdown({ children }: MarkdownProps) {
     </div>
   )
 }
-
-interface HighlightedPre extends React.HTMLAttributes<HTMLPreElement> {
-  children: string
-  language: string
-}
-
-const HighlightedPre = React.memo(({ children, language, ...props }: HighlightedPre) => {
-  const [tokens, setTokens] = useState<any>(null)
-  const [bundledLanguages, setBundledLanguages] = useState<any>(null)
-
-  useEffect(() => {
-    let isMounted = true
-
-    const loadShiki = async () => {
-      const { codeToTokens, bundledLanguages } = await import('shiki')
-
-      if (isMounted) {
-        setBundledLanguages(bundledLanguages)
-        if (!(language in bundledLanguages)) {
-          return
-        }
-
-        const { tokens } = await codeToTokens(children, {
-          lang: language as keyof typeof bundledLanguages,
-          defaultColor: false,
-          themes: {
-            light: 'github-light',
-            dark: 'github-dark',
-          },
-        })
-
-        setTokens(tokens)
-      }
-    }
-
-    loadShiki()
-
-    return () => {
-      isMounted = false
-    }
-  }, [children, language])
-
-  if (!bundledLanguages || !(language in bundledLanguages) || !tokens) {
-    return <pre {...props}>{children}</pre>
-  }
-
-  return (
-    <pre {...props}>
-      <code>
-        {tokens.map((line: any, lineIndex: any) => (
-          <React.Fragment key={lineIndex}>
-            <span>
-              {line.map((token: any, tokenIndex: any) => {
-                const style = typeof token.htmlStyle === 'string' ? undefined : token.htmlStyle
-
-                return (
-                  <span
-                    key={tokenIndex}
-                    className="bg-shiki-light-bg text-shiki-light dark:bg-shiki-dark-bg
-                      dark:text-shiki-dark"
-                    style={style}>
-                    {token.content}
-                  </span>
-                )
-              })}
-            </span>
-            {lineIndex !== tokens.length - 1 && '\n'}
-          </React.Fragment>
-        ))}
-      </code>
-    </pre>
-  )
-})
-
-HighlightedPre.displayName = 'HighlightedCode'
 
 interface CodeBlockProps extends React.HTMLAttributes<HTMLPreElement> {
   children: React.ReactNode

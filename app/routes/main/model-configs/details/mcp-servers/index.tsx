@@ -2,16 +2,15 @@ import { DataTable } from '@/components/data-table'
 import { AppPreloader } from '@/components/loader/pre-loader'
 import { Popover, PopoverContent, PopoverTrigger } from '@/modules/shadcn/ui/popover'
 import {
-  useDeleteMcpServer,
-  useMcpServers,
-  useRefreshMcpServerTools,
-} from '@/resources/hooks/mcp-servers/use-mcp-server'
+  useDetachModelConfigMCPServer,
+  useModelConfigMCPServers,
+} from '@/resources/hooks/model-config/use-model-config'
 import { McpServerType } from '@/resources/queries/mcp-servers/mcp-server.type'
 import { ensureCanonicalPagination } from '@/utils/helpers/pagination.helper'
 import { Button } from '@shadcn/ui/button'
 import { ColumnDef } from '@tanstack/react-table'
-import { Edit, EllipsisVertical, EyeIcon, RefreshCw, Trash2 } from 'lucide-react'
-import { useMemo, useRef, useState } from 'react'
+import { Edit, EllipsisVertical, EyeIcon, Unlink } from 'lucide-react'
+import { useMemo, useRef } from 'react'
 import { Link, useLoaderData, useNavigate } from 'react-router'
 import { ResourceID, useApp } from 'tessera-ui'
 import { DateTime, EmptyContent, NewButton } from 'tessera-ui/components'
@@ -19,7 +18,13 @@ import DeleteConfirmation, {
   type DeleteConfirmationHandle,
 } from 'tessera-ui/components/delete-confirmation'
 
-export async function loader({ request }: { request: Request }) {
+export async function loader({
+  request,
+  params,
+}: {
+  request: Request
+  params: { modelConfigID: string }
+}) {
   const pagination = ensureCanonicalPagination(request, {
     defaultSize: 25,
     defaultPage: 1,
@@ -32,25 +37,25 @@ export async function loader({ request }: { request: Request }) {
   const apiUrl = process.env.API_URL
   const nodeEnv = process.env.NODE_ENV
 
-  return { apiUrl, nodeEnv, pagination }
+  return { apiUrl, nodeEnv, pagination, id: params.modelConfigID }
 }
 
-export default function McpServersIndex() {
-  const { apiUrl, nodeEnv, pagination } = useLoaderData<typeof loader>()
+export default function ModelConfigMcpServersIndex() {
+  const { apiUrl, nodeEnv, pagination, id } = useLoaderData<typeof loader>()
   const { token, isLoadingIdenties } = useApp()
   const navigate = useNavigate()
   const deleteConfirmationRef = useRef<DeleteConfirmationHandle>(null)
-  const [refreshingIds, setRefreshingIds] = useState<Record<string, boolean>>({})
 
   const config = { apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv }
 
-  const { data, isLoading, error } = useMcpServers(
+  const { data, isLoading, error, isFetching } = useModelConfigMCPServers(
     config,
     { page: pagination.page, size: pagination.size },
-    { enabled: !!token && !isLoadingIdenties }
+    id,
+    { enabled: !!token && !isLoadingIdenties && !!id }
   )
 
-  const { mutateAsync: deleteMcpServer } = useDeleteMcpServer(config, {
+  const { mutateAsync: detachMcpServer } = useDetachModelConfigMCPServer(config, {
     onSuccess: () => {
       deleteConfirmationRef.current?.close()
     },
@@ -59,26 +64,15 @@ export default function McpServersIndex() {
     },
   })
 
-  const { mutateAsync: refreshTools } = useRefreshMcpServerTools(config)
-
   const handleDelete = (server: McpServerType) => {
     deleteConfirmationRef.current?.open({
-      title: 'Delete MCP Server',
-      description: `Are you sure you want to delete "${server.name}"? This action cannot be undone.`,
+      title: 'Detach MCP Server',
+      description: `Are you sure you want to detach "${server.name}"? This action cannot be undone.`,
       onDelete: async () => {
         deleteConfirmationRef?.current?.updateConfig({ isLoading: true })
-        await deleteMcpServer(server.id)
+        await detachMcpServer({ id, serverID: server.id })
       },
     })
-  }
-
-  const handleRefreshTools = async (server: McpServerType) => {
-    setRefreshingIds((prev) => ({ ...prev, [server.id]: true }))
-    try {
-      await refreshTools(server.id)
-    } finally {
-      setRefreshingIds((prev) => ({ ...prev, [server.id]: false }))
-    }
   }
 
   const columns = useMemo<ColumnDef<McpServerType>[]>(
@@ -155,26 +149,6 @@ export default function McpServersIndex() {
         cell: ({ row }) => <ResourceID value={row.original.id} />,
       },
       {
-        accessorKey: 'id',
-        header: 'Refresh Tools',
-        size: 150,
-        cell: ({ row }) => {
-          const server = row.original
-          const isRefreshing = !!refreshingIds[server.id]
-
-          return (
-            <Button
-              variant="ghost"
-              className="flex w-full justify-center gap-2 hover:bg-transparent"
-              onClick={() => handleRefreshTools(server)}
-              disabled={isRefreshing}
-              aria-label="Refresh tools">
-              <RefreshCw size={18} className={isRefreshing ? 'animate-spin' : undefined} />
-            </Button>
-          )
-        },
-      },
-      {
         id: 'actions',
         header: '',
         size: 20,
@@ -215,10 +189,10 @@ export default function McpServersIndex() {
                   className="hover:bg-destructive hover:text-destructive-foreground flex w-full
                     justify-start gap-2"
                   onClick={() => handleDelete(server)}
-                  aria-label="Delete MCP server"
+                  aria-label="Detach MCP server"
                   tabIndex={0}>
-                  <Trash2 size={18} />
-                  <span>Delete</span>
+                  <Unlink size={18} />
+                  <span>Detach</span>
                 </Button>
               </PopoverContent>
             </Popover>
@@ -226,10 +200,10 @@ export default function McpServersIndex() {
         },
       },
     ],
-    [navigate, refreshingIds]
+    [navigate]
   )
 
-  if (isLoading || isLoadingIdenties) {
+  if (isLoading || isLoadingIdenties || isFetching) {
     return <AppPreloader />
   }
 
@@ -247,10 +221,10 @@ export default function McpServersIndex() {
     return (
       <EmptyContent
         image="/images/empty-data.png"
-        title="No MCP servers found"
-        description="Get started by registering first MCP server.">
-        <Button onClick={() => navigate('/mcp-servers/new')} variant="black">
-          Start Creating
+        title="No MCP servers found for this Model Config"
+        description="Get started by connect to available MCP server.">
+        <Button onClick={() => navigate(`/model-configs/${id}/mcp-servers/new`)} variant="black">
+          Start Connection
         </Button>
       </EmptyContent>
     )
@@ -270,8 +244,8 @@ export default function McpServersIndex() {
       <div className="mb-5 flex items-center justify-between">
         <h1 className="page-title">MCP Servers</h1>
         <NewButton
-          label="New MCP Server"
-          onClick={() => navigate('/mcp-servers/new')}
+          label="Attach New MCP Server"
+          onClick={() => navigate(`/model-configs/${id}/mcp-servers/new`)}
           disabled={isLoading}
         />
       </div>

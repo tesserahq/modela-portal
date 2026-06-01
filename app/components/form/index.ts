@@ -10,6 +10,8 @@ import { FormEmail } from './form-email'
 import { FormCommand } from './form-command'
 import { FormAutocomplete } from './form-autocomplete'
 import { FormArray } from './form-array'
+import { FormComboBox } from './form-command-custom'
+import { FormSchemaMap } from './form-schema'
 
 const FormCompound = Object.assign(Form, {
   Input: FormInput,
@@ -23,6 +25,8 @@ const FormCompound = Object.assign(Form, {
   Autocomplete: FormAutocomplete,
   Array: FormArray,
   Provider: FormProvider,
+  ComboBox: FormComboBox,
+  Schema: FormSchemaMap,
 })
 
 export { FormCompound as Form, useFormContext }
