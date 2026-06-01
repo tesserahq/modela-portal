@@ -152,6 +152,7 @@ interface FormComboBoxProps<T> extends Omit<
   hideError?: boolean
   disabled?: boolean
   isLoading?: boolean
+  onChange?: (option: T | null) => void
   rules?: {
     required?: boolean | string
     validate?: (value: unknown) => boolean | string | Promise<boolean | string>
@@ -166,6 +167,7 @@ export function FormComboBox<T>({
   disabled,
   rules,
   isLoading,
+  onChange,
   ...comboBoxProps
 }: FormComboBoxProps<T>) {
   const { form } = useFormContext()
@@ -195,9 +197,10 @@ export function FormComboBox<T>({
             <ComboBoxSelect
               {...comboBoxProps}
               value={fieldProps.value ?? null}
-              onChange={(option) =>
+              onChange={(option) => {
                 fieldProps.onChange(option ? comboBoxProps.getOptionId(option) : null)
-              }
+                onChange?.(option)
+              }}
               disabled={disabled}
               required={required}
               isLoading={isLoading}

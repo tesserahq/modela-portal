@@ -1,7 +1,7 @@
 import { Form } from '@/components/form'
 import { Button } from '@shadcn/ui/button'
 import { Loader2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FormLayout } from '../form/form-layout'
 import { useNavigate } from 'react-router'
 import { IQueryConfig } from '@/resources/queries'
@@ -10,9 +10,12 @@ import {
   formValuesToModelConfig,
   ModelConfigFormValue,
   modelConfigSchema,
+  LLMProvider,
 } from '@/resources/queries/model-config'
 import { useSystemPrompts } from '@/resources/hooks/system-prompt/use-system-prompt'
 import { Badge } from '@/modules/shadcn/ui/badge'
+import { useLLMProviders } from '@/resources/hooks/model-config/use-model-config'
+import { AppPreloader } from '../loader/pre-loader'
 
 interface Props {
   config: IQueryConfig
@@ -24,6 +27,7 @@ interface Props {
 export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save', config }: Props) {
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const [selectedProvider, setSelectedProvider] = useState<LLMProvider | undefined>()
   const isEditMode = !!defaultValues?.slug
   const title = isEditMode ? 'Edit Model Config' : 'New Model Config'
 
@@ -31,6 +35,8 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
     page: 1,
     size: 100,
   })
+
+  const { data: providers, isLoading: isProvidersLoading } = useLLMProviders(config)
 
   const handleSubmit = async (
     data: ModelConfigFormValue | Omit<ModelConfigFormValue, 'slug' | 'provider' | 'model'>
@@ -42,6 +48,15 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  useEffect(() => {
+    if (!defaultValues || !providers) return
+    setSelectedProvider(providers?.find((p) => p.id === defaultValues.provider))
+  }, [defaultValues])
+
+  if (isLoading || isProvidersLoading) {
+    return <AppPreloader className="min-h-screen" />
   }
 
   return (
@@ -61,19 +76,31 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             disabled={isEditMode}
           />
           <Form.Input field="name" label="Name" placeholder="Enter name" autoFocus required />
-          <Form.Input
+          <Form.ComboBox
             field="provider"
             label="Provider"
-            placeholder="Enter provider"
+            placeholder="Select a provider..."
+            options={providers ?? []}
+            getOptionId={(p) => p.id}
+            getOptionLabel={(p) => p.name}
+            getSearchValue={(p) => p.name}
+            renderOption={(p) => <span className="font-medium">{p.name}</span>}
+            onChange={(value) => setSelectedProvider(value ?? undefined)}
+            isLoading={isProvidersLoading}
             required
-            // disabled={isEditMode}
           />
-          <Form.Input
+          <Form.ComboBox
             field="model"
             label="Model"
-            placeholder="Enter model"
+            placeholder={selectedProvider ? 'Select a model...' : 'Select a provider first'}
+            options={selectedProvider?.models ?? []}
+            getOptionId={(p) => p.id}
+            getOptionLabel={(p) => p.name}
+            getSearchValue={(p) => p.name}
+            renderOption={(p) => <span className="font-medium">{p.name}</span>}
+            isLoading={isProvidersLoading}
+            disabled={!selectedProvider}
             required
-            // disabled={isEditMode}
           />
           <Form.Switch field="is_default" label="Is Default" />
           <Form.Select

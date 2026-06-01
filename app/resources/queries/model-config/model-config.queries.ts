@@ -6,6 +6,7 @@ import {
   AttachModelConfigMCPServerData,
   ModelConfigType,
   UpdateModelConfigData,
+  LLMProvider,
 } from './model-config.type'
 import { McpServerType } from '../mcp-servers/mcp-server.type'
 
@@ -114,4 +115,14 @@ export async function deleteModelConfigMCPServer(
   await fetchApi(`${apiUrl}${RESOURCE_URL}/${id}/mcp-servers/${serverID}`, token, nodeEnv, {
     method: 'DELETE',
   })
+}
+
+export async function getLLMProviders(config: IQueryConfig): Promise<LLMProvider[]> {
+  const { apiUrl, token, nodeEnv } = config
+
+  const res = await fetchApi(`${apiUrl}/providers`, token, nodeEnv, {
+    method: 'GET',
+  })
+
+  return res as LLMProvider[]
 }

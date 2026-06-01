@@ -60,3 +60,17 @@ export type ModelConfigFormData = ModelConfigData
 export type AttachModelConfigMCPServerData = {
   server_id: string
 }
+
+/**
+ * LLM provider and model type
+ */
+export type LLMModel = {
+  id: string
+  name: string
+}
+
+export type LLMProvider = {
+  id: string
+  name: string
+  models: LLMModel[]
+}

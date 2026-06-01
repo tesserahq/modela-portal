@@ -4,6 +4,8 @@ export type {
   UpdateModelConfigData,
   ModelConfigEnum,
   AttachModelConfigMCPServerData,
+  LLMModel,
+  LLMProvider,
 } from './model-config.type'
 export {
   modelConfigToFormValues,
@@ -25,4 +27,7 @@ export {
   getModelConfigMCPServer,
   deleteModelConfig,
   updateModelConfig,
+  createModelConfigMCPServer,
+  deleteModelConfigMCPServer,
+  getLLMProviders,
 } from './model-config.queries'

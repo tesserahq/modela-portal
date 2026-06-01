@@ -15,6 +15,7 @@ import {
 import {
   createModelConfigMCPServer,
   deleteModelConfigMCPServer,
+  getLLMProviders,
 } from '@/resources/queries/model-config/model-config.queries'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'tessera-ui/components'
@@ -41,6 +42,7 @@ export const contextSourceQueryKeys = {
   mcpServers: () => [...contextSourceQueryKeys.all, 'mcp-servers'] as const,
   mcpServersList: (id: string, params: IQueryParams) =>
     [...contextSourceQueryKeys.mcpServers(), id, params] as const,
+  llmProviders: () => [...contextSourceQueryKeys.all, 'providers'] as const,
 }
 
 export function useModelConfigs(
@@ -287,5 +289,30 @@ export function useDetachModelConfigMCPServer(
       toast.error('Failed to detached MCP Server', { description: error.message })
       options?.onError?.(error)
     },
+  })
+}
+
+export function useLLMProviders(
+  config: IQueryConfig,
+  options?: {
+    enabled?: boolean
+    staleTime?: number
+  }
+) {
+  return useQuery({
+    queryKey: contextSourceQueryKeys.llmProviders(),
+    queryFn: async () => {
+      try {
+        if (!config.token) {
+          throw new QueryError('Token is required', 'TOKEN_REQUIRED')
+        }
+
+        return await getLLMProviders(config)
+      } catch (error: any) {
+        throw new QueryError(error)
+      }
+    },
+    staleTime: options?.staleTime || 5 * 60 * 1000,
+    enabled: options?.enabled !== false && !!config.token,
   })
 }

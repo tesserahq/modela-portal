@@ -185,17 +185,17 @@ export default function ModelConfiglOverview() {
             </div>
             <div className="d-item">
               <dt className="d-label">Name</dt>
-              <dd className="d-content">{data?.system_prompt.name || 'N/A'}</dd>
+              <dd className="d-content">{data?.system_prompt?.name || 'N/A'}</dd>
             </div>
-            <Activity mode={data?.system_prompt.content ? 'visible' : 'hidden'}>
+            <Activity mode={data?.system_prompt?.content ? 'visible' : 'hidden'}>
               <div className="d-item mb-7">
                 <dt className="d-label">Content</dt>
               </div>
             </Activity>
           </div>
-          <Activity mode={data?.system_prompt.content ? 'visible' : 'hidden'}>
+          <Activity mode={data?.system_prompt?.content ? 'visible' : 'hidden'}>
             <DetailContent title={''}>
-              <Markdown>{data?.system_prompt.content ?? '-'}</Markdown>
+              <Markdown>{data?.system_prompt?.content ?? '-'}</Markdown>
             </DetailContent>
           </Activity>
         </DetailContent>
