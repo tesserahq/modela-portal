@@ -40,6 +40,8 @@ export default [
         route('mcp-servers/new', 'routes/main/model-configs/details/mcp-servers/new.tsx'),
       ]),
     ]),
+
+    route('/analytics', 'routes/main/analytics/index.tsx'),
   ]),
 
   // Access Denied
