@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import { flexRender, getCoreRowModel, useReactTable } from '@tanstack/react-table'
@@ -93,7 +94,10 @@ export function DataTable<TData, TValue>({
                     return (
                       <TableHead
                         key={header.id}
-                        className="text-navy-800 dark:text-navy-100 py-2 font-semibold"
+                        className={cn(
+                          'text-navy-800 dark:text-navy-100 py-2 font-semibold',
+                          (header.column.columnDef.meta as any)?.headerClassName
+                        )}
                         style={{ width: header.column.columnDef.size }}>
                         {header.column.columnDef.header ? (
                           header.isPlaceholder ? null : (

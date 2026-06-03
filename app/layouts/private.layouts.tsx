@@ -4,7 +4,7 @@ import { useRequestInfo } from '@/hooks/useRequestInfo'
 import { ROUTE_PATH as THEME_PATH } from '@/routes/resources/update-theme'
 import { SITE_CONFIG } from '@/utils/config/site.config'
 import { useAuth0 } from '@auth0/auth0-react'
-import { BrainCog, Database, KeyRound, Server } from 'lucide-react'
+import { BrainCog, ChartBar, Database, KeyRound, Server } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Outlet, useLoaderData, useLocation, useNavigate, useParams, useSubmit } from 'react-router'
 import { Layout, MainItemProps, TesseraProvider } from 'tessera-ui'
@@ -61,6 +61,11 @@ export default function PrivateLayout() {
   }, [isLoading, isAuthenticated])
 
   const menuItems: MainItemProps[] = [
+    {
+      title: 'Analytics',
+      path: `/analytics`,
+      icon: ChartBar,
+    },
     {
       title: 'Credentials',
       path: `/credentials`,

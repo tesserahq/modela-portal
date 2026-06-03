@@ -25,7 +25,7 @@ interface ComboBoxSelectProps<T> extends Omit<ComboBoxProps<T>, 'name' | 'error'
   isLoading?: boolean
 }
 
-function ComboBoxSelect<T>({
+export function ComboBoxSelect<T>({
   value,
   onChange,
   options,
