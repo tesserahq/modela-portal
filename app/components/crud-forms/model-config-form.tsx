@@ -120,13 +120,13 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             placeholder="Search system prompts..."
             options={data?.items ?? []}
             getOptionId={(p) => p.id}
-            getOptionLabel={(p) => `${p.name} v.${p.current_version.version_number}`}
+            getOptionLabel={(p) => `${p.name} v.${p.current_version?.version_number}`}
             getSearchValue={(p) => `${p.name} ${p.id}`}
             renderOption={(p) => (
               <div className="flex space-x-3">
                 <span className="font-medium">{p.name}</span>
                 <Badge variant="outline" className="border border-green-500 text-green-600 py-0">
-                  <span className="text-xs">v.{p.current_version.version_number}</span>
+                  <span className="text-xs">v.{p.current_version?.version_number}</span>
                 </Badge>
               </div>
             )}
