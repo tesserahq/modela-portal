@@ -49,8 +49,6 @@ export default function EditModelConfig() {
 
     const changedData = getChangedModelConfigUpdateData(data, rawData)
 
-    console.log(changedData)
-
     if (Object.keys(changedData).length === 0) {
       navigate(`/model-configs/${modelConfigID}`)
       return

@@ -4,7 +4,7 @@ import { useRequestInfo } from '@/hooks/useRequestInfo'
 import { ROUTE_PATH as THEME_PATH } from '@/routes/resources/update-theme'
 import { SITE_CONFIG } from '@/utils/config/site.config'
 import { useAuth0 } from '@auth0/auth0-react'
-import { BrainCog, ChartBar, Database, KeyRound, Server } from 'lucide-react'
+import { BrainCog, ChartBar, CloudCog, Database, KeyRound, Server } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Outlet, useLoaderData, useLocation, useNavigate, useParams, useSubmit } from 'react-router'
 import { Layout, MainItemProps, TesseraProvider } from 'tessera-ui'
@@ -28,7 +28,8 @@ export default function PrivateLayout() {
   const isEditPage = useLocation().pathname.includes('edit')
   const shouldCollapseSidebar =
     (Boolean(params['modelConfigID']) ||
-      Boolean(params['contextSourceID']) ||
+      Boolean(params['promptID']) ||
+      Boolean(params['credentialID']) ||
       Boolean(params['mcpServerID'])) &&
     !isEditPage
 
@@ -65,6 +66,11 @@ export default function PrivateLayout() {
       title: 'Analytics',
       path: `/analytics`,
       icon: ChartBar,
+    },
+    {
+      title: 'System Prompts',
+      path: `/system-prompts`,
+      icon: CloudCog,
     },
     {
       title: 'Credentials',

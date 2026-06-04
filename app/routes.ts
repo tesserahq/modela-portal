@@ -41,6 +41,18 @@ export default [
       ]),
     ]),
 
+    route('/system-prompts', 'routes/main/system-prompts/layout.tsx', [
+      index('routes/main/system-prompts/index.tsx'),
+      route('new', 'routes/main/system-prompts/new.tsx'),
+      route(':promptID/edit', 'routes/main/system-prompts/edit.tsx'),
+      route(':promptID', 'routes/main/system-prompts/details/layout.tsx', [
+        index('routes/main/system-prompts/details/index.tsx'),
+        route('overview', 'routes/main/system-prompts/details/overview.tsx'),
+        route('versions', 'routes/main/system-prompts/details/versions/index.tsx'),
+        route('versions/new', 'routes/main/system-prompts/details/versions/new.tsx'),
+      ]),
+    ]),
+
     route('/analytics', 'routes/main/analytics/index.tsx'),
   ]),
 
