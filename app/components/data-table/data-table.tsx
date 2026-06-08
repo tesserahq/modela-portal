@@ -22,6 +22,7 @@ export function DataTable<TData, TValue>({
   onTableReady,
   paginationScope,
   callbackPagination,
+  onRowClick,
 }: DataTableProps<TData, TValue>) {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const [skeletonRowCount, setSkeletonRowCount] = useState<number>(10)
@@ -121,7 +122,11 @@ export function DataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && 'selected'}
-                    className="dark:border-border dark:hover:bg-navy-600 hover:bg-slate-50">
+                    className={cn(
+                      'dark:border-border dark:hover:bg-navy-600 hover:bg-slate-50',
+                      onRowClick && 'cursor-pointer'
+                    )}
+                    onClick={() => onRowClick?.(row.original)}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}

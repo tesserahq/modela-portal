@@ -53,6 +53,14 @@ export default [
       ]),
     ]),
 
+    route('/completions', 'routes/main/completions/layout.tsx', [
+      index('routes/main/completions/index.tsx'),
+      route(':completionID', 'routes/main/completions/details/layout.tsx', [
+        index('routes/main/completions/details/index.tsx'),
+        route('overview', 'routes/main/completions/details/overview.tsx'),
+      ]),
+    ]),
+
     route('/analytics', 'routes/main/analytics/index.tsx'),
   ]),
 

@@ -117,5 +117,5 @@ export function getResourceName(resource: BreadcrumbResourceData | undefined): s
   }
 
   // Fallback for other types
-  return ''
+  return (resource as { id: string }).id
 }

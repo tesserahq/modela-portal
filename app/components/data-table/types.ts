@@ -14,6 +14,7 @@ export interface DataTableProps<TData, TValue> {
   onTableReady?: (table: ReactTableType<TData>) => void
   paginationScope?: string
   callbackPagination?: ({ page, size }: { page: number; size: number }) => void
+  onRowClick?: (row: TData) => void
 }
 
 export type TableCellSkeletonsProps<TData> = {
