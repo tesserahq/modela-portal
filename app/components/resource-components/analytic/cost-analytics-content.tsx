@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/modules/shadcn/ui/select'
+import { formatCost } from './cost-utils'
 
 type Props = {
   config: IQueryConfig
@@ -119,13 +120,7 @@ export function CostAnalyticsContent({ config, data, isLoading }: Props) {
             {isLoading ? (
               <Skeleton className="h-7 w-full" />
             ) : (
-              <p className="text-3xl font-medium">
-                $
-                {totalSpend.toLocaleString('en-US', {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </p>
+              <p className="text-3xl font-medium">{formatCost(totalSpend.toString())}</p>
             )}
           </CardContent>
         </Card>
