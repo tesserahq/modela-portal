@@ -6,6 +6,7 @@ import {
   ChartTooltipContent,
 } from '@/modules/shadcn/ui/chart'
 import { AnalyticCostSummaryType } from '@/resources/queries/analytic'
+import { formatCost } from './cost-utils'
 
 const chartConfig = {
   total_cost_usd: {
@@ -50,11 +51,7 @@ export function CostChart({ data }: CostChartProps) {
             <ChartTooltipContent
               formatter={(value) => (
                 <span className="font-mono font-medium">
-                  $
-                  {Number(value).toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  {formatCost(value?.toString() ?? '0')}
                 </span>
               )}
             />

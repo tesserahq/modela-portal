@@ -2,6 +2,7 @@ import { DataTable } from '@/components/data-table'
 import { AnalyticCostSummaryType } from '@/resources/queries/analytic'
 import { ColumnDef } from '@tanstack/react-table'
 import { useMemo } from 'react'
+import { formatCost } from './cost-utils'
 
 type Props = {
   data: AnalyticCostSummaryType[] | undefined
@@ -34,13 +35,7 @@ export function CostTable({ data, isLoading }: Props) {
         cell: ({ row }) => {
           const { total_cost_usd } = row.original
           return (
-            <div className="max-w-[200px] truncate text-right">
-              $
-              {Number(total_cost_usd).toLocaleString('en-US', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </div>
+            <div className="max-w-[200px] truncate text-right">{formatCost(total_cost_usd)}</div>
           )
         },
       },
