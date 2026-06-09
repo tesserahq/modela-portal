@@ -42,25 +42,6 @@ export default function CompletionsIndex() {
   const columns = useMemo<ColumnDef<CompletionRequestType>[]>(
     () => [
       {
-        accessorKey: 'created_at',
-        header: 'Date',
-        size: 180,
-        cell: ({ row }) => {
-          const date = row.getValue('created_at') as string
-          return <DateTime date={date} formatStr="dd/MM/yyyy HH:mm" />
-        },
-      },
-      {
-        accessorKey: 'request_id',
-        header: 'Request ID',
-        size: 150,
-        cell: ({ row }) => (
-          <div onClick={(e) => e.stopPropagation()}>
-            <ResourceID value={row.original.request_id} />
-          </div>
-        ),
-      },
-      {
         accessorKey: 'provider',
         header: 'Provider',
         size: 120,
@@ -117,6 +98,25 @@ export default function CompletionsIndex() {
           const val = row.original.finish_reason
           return <span>{val ?? '-'}</span>
         },
+      },
+      {
+        accessorKey: 'created_at',
+        header: 'Created At',
+        size: 180,
+        cell: ({ row }) => {
+          const date = row.getValue('created_at') as string
+          return <DateTime date={date} formatStr="dd/MM/yyyy HH:mm" />
+        },
+      },
+      {
+        accessorKey: 'id',
+        header: 'ID',
+        size: 150,
+        cell: ({ row }) => (
+          <div onClick={(e) => e.stopPropagation()}>
+            <ResourceID value={row.original.id} />
+          </div>
+        ),
       },
     ],
     [navigate]

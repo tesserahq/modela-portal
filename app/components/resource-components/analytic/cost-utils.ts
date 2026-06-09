@@ -1,12 +1,13 @@
 export function formatCost(value: string): string {
   const num = parseFloat(value)
 
+  if (!Number.isFinite(num) || num === 0) {
+    return '$0.00'
+  }
+
   const abs = Math.abs(num)
 
-  if (abs === 0) return '$0.00'
-
   if (abs >= 0.01) {
-    // Normal range — 2 decimal
     return (
       '$' +
       num.toLocaleString('en-US', {
@@ -16,11 +17,13 @@ export function formatCost(value: string): string {
     )
   }
 
-  if (abs >= 0.0001) {
-    // Small but readable — show significant figures (e.g. $0.000708)
-    return '$' + num.toPrecision(3)
-  }
-
-  // Very small — scientific notation (e.g. $7.08e-6)
-  return '$' + num.toExponential(2)
+  // For small numbers, show enough decimals without scientific notation
+  return (
+    '$' +
+    num.toLocaleString('en-US', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 12,
+      useGrouping: false,
+    })
+  )
 }
