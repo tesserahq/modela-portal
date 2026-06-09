@@ -1,5 +1,6 @@
 import { DataTable } from '@/components/data-table'
 import { AppPreloader } from '@/components/loader/pre-loader'
+import { Badge } from '@/modules/shadcn/ui/badge'
 import { Popover, PopoverContent, PopoverTrigger } from '@/modules/shadcn/ui/popover'
 import {
   useDeleteModelConfig,
@@ -76,10 +77,16 @@ export default function ModelConfigsIndex() {
         size: 200,
         cell: ({ row }) => {
           const { name } = row.original
+          const isDefault = row.original.is_default
           return (
             <Link to={`/model-configs/${row.original.id}`} className="button-link">
               <div className="max-w-[200px] truncate" title={name}>
-                {name || '-'}
+                <span>{name || '-'}</span>
+                {isDefault && (
+                  <Badge variant="outline" className="border ml-2 border-green-500 text-green-600">
+                    <span className="text-xs">default</span>
+                  </Badge>
+                )}
               </div>
             </Link>
           )
