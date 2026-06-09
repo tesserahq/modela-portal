@@ -8,6 +8,7 @@ import { getCredential } from '@/resources/queries/credentials/credential.querie
 import { getMcpServer } from '@/resources/queries/mcp-servers/mcp-server.queries'
 import { getModelConfig } from '@/resources/queries/model-config'
 import { getSystemPrompt } from '@/resources/queries/system-prompt'
+import { getCompletionRequest } from '@/resources/queries/completion'
 
 /**
  * Resource state per breadcrumb
@@ -48,6 +49,7 @@ const breadcrumbFetchers = {
   mcpServerID: (config: IQueryConfig, id: string) => getMcpServer(config, id),
   modelConfigID: (config: IQueryConfig, id: string) => getModelConfig(config, id),
   promptID: (config: IQueryConfig, id: string) => getSystemPrompt(config, id),
+  completionID: (config: IQueryConfig, id: string) => getCompletionRequest(config, id),
 }
 
 export default function useBreadcrumb(config: BreadcrumbConfigType): BreadcrumbItemData[] {

@@ -4,7 +4,15 @@ import { useRequestInfo } from '@/hooks/useRequestInfo'
 import { ROUTE_PATH as THEME_PATH } from '@/routes/resources/update-theme'
 import { SITE_CONFIG } from '@/utils/config/site.config'
 import { useAuth0 } from '@auth0/auth0-react'
-import { BrainCog, ChartBar, CloudCog, Database, KeyRound, Server } from 'lucide-react'
+import {
+  BrainCog,
+  ChartBar,
+  CloudCog,
+  Database,
+  KeyRound,
+  PackageCheck,
+  Server,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Outlet, useLoaderData, useLocation, useNavigate, useParams, useSubmit } from 'react-router'
 import { Layout, MainItemProps, TesseraProvider } from 'tessera-ui'
@@ -30,6 +38,7 @@ export default function PrivateLayout() {
     (Boolean(params['modelConfigID']) ||
       Boolean(params['promptID']) ||
       Boolean(params['credentialID']) ||
+      Boolean(params['completionID']) ||
       Boolean(params['mcpServerID'])) &&
     !isEditPage
 
@@ -86,6 +95,11 @@ export default function PrivateLayout() {
       title: 'Model Configs',
       path: `/model-configs`,
       icon: BrainCog,
+    },
+    {
+      title: 'Completions',
+      path: `/completions`,
+      icon: PackageCheck,
     },
   ]
 

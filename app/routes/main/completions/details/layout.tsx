@@ -1,19 +1,17 @@
 import useBreadcrumb from '@/hooks/useBreadcrumbs'
 import { Button } from '@/modules/shadcn/ui/button'
-import { FileText, Layers, Server } from 'lucide-react'
+import { Box } from 'lucide-react'
 import { Outlet, useLoaderData, useLocation, useNavigate, useParams } from 'react-router'
 import { useApp } from 'tessera-ui'
 import { EmptyContent } from 'tessera-ui/components'
 import { DetailItemsProps, Layout } from 'tessera-ui/layouts'
-import { useCredential } from '@/resources/hooks/credentials/use-credential'
-import { useModelConfig } from '@/resources/hooks/model-config/use-model-config'
-import { useSystemPrompt } from '@/resources/hooks/system-prompt/use-system-prompt'
+import { useCompletionRequest } from '@/resources/hooks/completion/use-completion'
 
-export function loader({ params }: { params: { promptID: string } }) {
+export function loader({ params }: { params: { completionID: string } }) {
   const apiUrl = process.env.API_URL
   const nodeEnv = process.env.NODE_ENV
 
-  return { apiUrl, nodeEnv, id: params.promptID }
+  return { apiUrl, nodeEnv, id: params.completionID }
 }
 
 export default function SystemPromptDetailLayout() {
@@ -26,17 +24,12 @@ export default function SystemPromptDetailLayout() {
   const menuItems: DetailItemsProps[] = [
     {
       title: 'Overview',
-      path: `/system-prompts/${id}/overview`,
-      icon: FileText,
-    },
-    {
-      title: 'Versions',
-      path: `/system-prompts/${id}/versions`,
-      icon: Layers,
+      path: `/completions/${id}/overview`,
+      icon: Box,
     },
   ]
 
-  const { data, isLoading, error } = useSystemPrompt(
+  const { data, isLoading, error } = useCompletionRequest(
     { apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv },
     id,
     { enabled: !!token }
@@ -53,10 +46,10 @@ export default function SystemPromptDetailLayout() {
   if (!isLoading && (error || !data)) {
     return (
       <EmptyContent
-        title="Oops No System Prompt Found"
+        title="Oops No Request Found"
         image="/images/empty-data.png"
-        description={`We can't find System Prompt with ID ${id}. ${(error as Error)?.message ?? ''}`}>
-        <Button onClick={() => navigate('/system-prompts')}>Back to Listing</Button>
+        description={`We can't find Request with ID ${id}. ${(error as Error)?.message ?? ''}`}>
+        <Button onClick={() => navigate('/completions')}>Back to Listing</Button>
       </EmptyContent>
     )
   }
