@@ -54,9 +54,9 @@ export default function CompletionOverview() {
           </div>
           <Activity mode={data?.created_by_id ? 'visible' : 'hidden'}>
             <div className="d-item pb-1!">
-              <dt className="d-label">Created By ID</dt>
+              <dt className="d-label">Created By</dt>
               <dd className="d-content break-all">
-                <ResourceID value={data?.created_by_id || ''} />
+                {`${data.created_by.first_name ?? ''} ${data.created_by.last_name ?? ''}`.trim()}
               </dd>
             </div>
           </Activity>

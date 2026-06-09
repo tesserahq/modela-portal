@@ -11,6 +11,12 @@ export type CompletionRequestType = {
   cost_estimate_usd: string
   finish_reason: string | null
   created_by_id: string | null
+  created_by: {
+    id: string
+    first_name: string
+    last_name: string
+    email: string | null
+  }
   created_at: string
   updated_at: string
 }
