@@ -32,7 +32,7 @@ export default function CostAnalytics() {
     [group_by, start_date, end_date]
   )
 
-  const { data, isLoading, error, isFetching } = useAnalyticCosts(config, params, false, {
+  const { data, isLoading, error, isFetching } = useAnalyticCosts(config, params, {
     enabled: !!token && !isLoadingIdenties,
   })
 
