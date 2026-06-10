@@ -21,7 +21,9 @@ interface CostChartProps {
 
 export function CostChart({ data }: CostChartProps) {
   const chartData = data.map((item, index) => ({
-    name: item.group_value ?? 'Unattributed',
+    name: item.group_details
+      ? `${item.group_details.first_name ?? ''} ${item.group_details.last_name ?? ''}`.trim()
+      : (item.group_value ?? 'Unattributed'),
     total_cost_usd: item.total_cost_usd,
     fill: index === 0 ? 'hsl(var(--chart-1))' : 'hsl(var(--chart-2))',
   }))
