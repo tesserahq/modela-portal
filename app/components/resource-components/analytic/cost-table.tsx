@@ -23,8 +23,11 @@ export function CostTable({ data, isLoading }: Props) {
         header: 'Group',
         size: 500,
         cell: ({ row }) => {
-          const { group_value } = row.original
-          return <div className="max-w-[200px] truncate">{group_value || 'Unattributed'}</div>
+          const { group_value, group_details } = row.original
+          const displayValue = group_details
+            ? `${group_details.first_name ?? ''} ${group_details.last_name ?? ''}`.trim()
+            : (group_value ?? 'Unattributed')
+          return <div className="max-w-[200px] truncate">{displayValue}</div>
         },
       },
       {

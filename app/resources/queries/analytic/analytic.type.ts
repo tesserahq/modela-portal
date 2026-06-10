@@ -1,7 +1,15 @@
+export type UserCompactType = {
+  id: string
+  first_name: string
+  last_name: string
+  email: string | null
+}
+
 export type AnalyticCostSummaryType = {
   group_key: string
   group_value: string | null
   total_cost_usd: string
+  group_details: UserCompactType | null
 }
 
 export type AnalyticCostGroupEnum = 'user' | 'provider' | 'model' | 'project_id'
