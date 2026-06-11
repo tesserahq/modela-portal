@@ -9,9 +9,9 @@ export type ModelConfigType = {
   provider: string
   model: string
   system_prompt_id: string | null
-  temperature: number
-  max_tokens: number
-  top_p: number
+  temperature: number | null
+  max_tokens: number | null
+  top_p: number | null
   output_schema: Record<string, unknown>
   config_type: ModelConfigEnum
   is_default: boolean
@@ -73,4 +73,18 @@ export type LLMProvider = {
   id: string
   name: string
   models: LLMModel[]
+  parameters: ProviderParameters | null
+}
+
+type ParameterSpec = {
+  default: number | null
+  min: number | null
+  max: number | null
+}
+
+type ProviderParameters = {
+  temperature: ParameterSpec | null
+  top_p: ParameterSpec | null
+  max_tokens: ParameterSpec | null
+  exclusive_parameter_groups: string[][] | null
 }
