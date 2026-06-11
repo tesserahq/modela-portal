@@ -9,9 +9,9 @@ export type ModelConfigType = {
   provider: string
   model: string
   system_prompt_id: string | null
-  temperature: number
-  max_tokens: number
-  top_p: number
+  temperature: number | null
+  max_tokens: number | null
+  top_p: number | null
   output_schema: Record<string, unknown>
   config_type: ModelConfigEnum
   is_default: boolean
