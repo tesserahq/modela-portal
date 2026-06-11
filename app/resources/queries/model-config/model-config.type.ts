@@ -73,4 +73,18 @@ export type LLMProvider = {
   id: string
   name: string
   models: LLMModel[]
+  parameters: ProviderParameters | null
+}
+
+type ParameterSpec = {
+  default: number | null
+  min: number | null
+  max: number | null
+}
+
+type ProviderParameters = {
+  temperature: ParameterSpec | null
+  top_p: ParameterSpec | null
+  max_tokens: ParameterSpec | null
+  exclusive_parameter_groups: string[][] | null
 }

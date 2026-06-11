@@ -130,7 +130,7 @@ export default function ModelConfiglOverview() {
               )}
             </dd>
           </div>
-          {/* <div className="d-item pb-1!">
+          <div className="d-item pb-1!">
             <dt className="d-label">Temperature</dt>
             <dd className="d-content">{data?.temperature ?? 'N/A'}</dd>
           </div>
@@ -142,7 +142,7 @@ export default function ModelConfiglOverview() {
             <dt className="d-label">Top P</dt>
             <dd className="d-content">{data?.top_p ?? 'N/A'}</dd>
           </div>
-          <div className="d-item pb-1!">
+          {/* <div className="d-item pb-1!">
             <dt className="d-label">Max Tool Rounds</dt>
             <dd className="d-content">{data?.max_tool_rounds ?? 'N/A'}</dd>
           </div> */}
