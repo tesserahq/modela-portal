@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Form } from '@/components/form'
 import { Button } from '@shadcn/ui/button'
-import { Loader2 } from 'lucide-react'
+import { Loader2, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { FormLayout } from '../form/form-layout'
 import { useNavigate } from 'react-router'
@@ -9,6 +10,7 @@ import {
   ModelConfigData,
   formValuesToModelConfig,
   ModelConfigFormValue,
+  ModelConfigLimits,
   modelConfigSchema,
   LLMProvider,
 } from '@/resources/queries/model-config'
@@ -16,26 +18,64 @@ import { useSystemPrompts } from '@/resources/hooks/system-prompt/use-system-pro
 import { Badge } from '@/modules/shadcn/ui/badge'
 import { useLLMProviders } from '@/resources/hooks/model-config/use-model-config'
 import { AppPreloader } from '../loader/pre-loader'
-import { useFormContext } from 'react-hook-form'
+import { useFormContext, UseFormWatch } from 'react-hook-form'
+
+function createDefaultChecker(
+  watch: UseFormWatch<ModelConfigFormValue>,
+  params?: LLMProvider['parameters']
+) {
+  return (field: 'temperature' | 'max_tokens' | 'top_p') => {
+    const currentValue = watch(field)
+    const defaultValue = params?.[field]?.default ?? null
+    const normalizedCurrent = (currentValue === ('' as any) ? null : currentValue) ?? null
+    return normalizedCurrent !== defaultValue
+  }
+}
 
 interface LLMParamsFormProps {
   providers: LLMProvider[]
   isProvidersLoading: boolean
   defaultValues: ModelConfigFormValue
+  onLimitsChange: (limits: ModelConfigLimits | undefined) => void
 }
 
-function LLMParamsForm({ providers, isProvidersLoading, defaultValues }: LLMParamsFormProps) {
+function LLMParamsForm({
+  providers,
+  isProvidersLoading,
+  defaultValues,
+  onLimitsChange,
+}: LLMParamsFormProps) {
   const [selectedProvider, setSelectedProvider] = useState<LLMProvider | undefined>()
-  const { setValue } = useFormContext<ModelConfigFormValue>()
+  const { setValue, watch } = useFormContext<ModelConfigFormValue>()
   const params = selectedProvider?.parameters
 
   useEffect(() => {
     if (!defaultValues || !providers) return
-    setSelectedProvider(providers.find((p) => p.id === defaultValues.provider))
+    const provider = providers.find((p) => p.id === defaultValues.provider)
+    setSelectedProvider(provider)
+    onLimitsChange(providerToLimits(provider))
   }, [defaultValues, providers])
+
+  const toLimit = (
+    spec: { min: number | null; max: number | null } | null | undefined
+  ): { min: number; max: number } | undefined => {
+    if (spec?.min == null || spec?.max == null) return undefined
+    return { min: spec.min, max: spec.max }
+  }
+
+  const providerToLimits = (provider: LLMProvider | undefined): ModelConfigLimits | undefined => {
+    if (!provider?.parameters) return undefined
+    const { temperature, max_tokens, top_p } = provider.parameters
+    return {
+      temperature: toLimit(temperature),
+      max_tokens: toLimit(max_tokens),
+      top_p: toLimit(top_p),
+    }
+  }
 
   const handleProviderChange = (provider: LLMProvider | undefined) => {
     setSelectedProvider(provider)
+    onLimitsChange(providerToLimits(provider))
     setValue('model', '')
     if (provider?.parameters?.temperature?.default != null)
       setValue('temperature', provider.parameters.temperature.default)
@@ -44,6 +84,9 @@ function LLMParamsForm({ providers, isProvidersLoading, defaultValues }: LLMPara
     if (provider?.parameters?.max_tokens?.default != null)
       setValue('max_tokens', provider.parameters.max_tokens.default)
   }
+
+  const isDifferentFromDefault = createDefaultChecker(watch, params)
+
   return (
     <>
       <Form.ComboBox
@@ -77,6 +120,7 @@ function LLMParamsForm({ providers, isProvidersLoading, defaultValues }: LLMPara
           field="temperature"
           label="Temperature"
           type="number"
+          className="no-num-spinner"
           step={0.1}
           description={
             params?.temperature
@@ -86,11 +130,21 @@ function LLMParamsForm({ providers, isProvidersLoading, defaultValues }: LLMPara
           min={params?.temperature?.min ?? undefined}
           max={params?.temperature?.max ?? undefined}
           disabled={!selectedProvider}
+          trailing={
+            params?.temperature?.default != null &&
+            watch('temperature') !== params?.temperature?.default
+              ? {
+                  icon: 'default',
+                  onClick: () => setValue('temperature', params?.temperature?.default ?? null),
+                }
+              : undefined
+          }
         />
         <Form.Input
           field="max_tokens"
           label="Max Tokens"
           type="number"
+          className="no-num-spinner"
           description={
             params?.max_tokens
               ? `min: ${params.max_tokens.min} · default: ${params.max_tokens.default} · max: ${params.max_tokens.max}`
@@ -99,11 +153,21 @@ function LLMParamsForm({ providers, isProvidersLoading, defaultValues }: LLMPara
           min={params?.max_tokens?.min ?? undefined}
           max={params?.max_tokens?.max ?? undefined}
           disabled={!selectedProvider}
+          trailing={
+            params?.max_tokens?.default != null &&
+            watch('max_tokens') !== params?.max_tokens?.default
+              ? {
+                  icon: 'default',
+                  onClick: () => setValue('max_tokens', params?.max_tokens?.default ?? undefined),
+                }
+              : undefined
+          }
         />
         <Form.Input
           field="top_p"
           label="Top P"
           type="number"
+          className="no-num-spinner"
           step={0.1}
           description={
             params?.top_p
@@ -113,6 +177,14 @@ function LLMParamsForm({ providers, isProvidersLoading, defaultValues }: LLMPara
           min={params?.top_p?.min ?? undefined}
           max={params?.top_p?.max ?? undefined}
           disabled={!selectedProvider}
+          trailing={
+            isDifferentFromDefault('top_p')
+              ? {
+                  icon: 'default',
+                  onClick: () => setValue('top_p', params?.top_p?.default ?? ('' as any)),
+                }
+              : undefined
+          }
         />
       </div>
     </>
@@ -129,19 +201,19 @@ interface Props {
 export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save', config }: Props) {
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-  const isEditMode = !!defaultValues?.slug
+  const [limits, setLimits] = useState<ModelConfigLimits | undefined>()
+  const isEditMode = !!defaultValues
   const title = isEditMode ? 'Edit Model Config' : 'New Model Config'
 
   const { data, isLoading } = useSystemPrompts(config, { page: 1, size: 100 })
   const { data: providers, isLoading: isProvidersLoading } = useLLMProviders(config)
 
-  const handleSubmit = async (
-    data: ModelConfigFormValue | Omit<ModelConfigFormValue, 'slug' | 'provider' | 'model'>
-  ) => {
+  const handleSubmit = async (data: ModelConfigFormValue) => {
     setIsSubmitting(true)
     try {
-      await onSubmit(formValuesToModelConfig(data as ModelConfigFormValue))
-    } catch {
+      await onSubmit(formValuesToModelConfig(data))
+    } catch (error: any) {
+      console.log('FORM ERROR', error)
     } finally {
       setIsSubmitting(false)
     }
@@ -154,7 +226,7 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
   return (
     <div className="pt-5">
       <Form
-        schema={modelConfigSchema}
+        schema={modelConfigSchema(limits)}
         defaultValues={defaultValues}
         onSubmit={handleSubmit}
         mode="onChange"
@@ -172,6 +244,7 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             providers={providers ?? []}
             isProvidersLoading={isProvidersLoading}
             defaultValues={defaultValues}
+            onLimitsChange={setLimits}
           />
           <Form.Switch field="is_default" label="Is Default" />
           <Form.Select

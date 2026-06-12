@@ -19,6 +19,7 @@ export {
   modelConfigMCPServerSchema,
   modelConfigMCPServerFormDefaultValue,
   type ModelConfigMCPServerFormValue,
+  type ModelConfigLimits,
 } from './model-config.schema'
 export {
   getModelConfigs,

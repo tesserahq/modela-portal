@@ -14,13 +14,13 @@ export function modelConfigToFormValues(data: ModelConfigType): ModelConfigFormV
     provider: data.provider,
     model: data.model,
     system_prompt_id: data.system_prompt_id,
-    temperature: data.temperature,
-    max_tokens: data.max_tokens,
-    top_p: data.top_p,
+    temperature: data.temperature ?? null,
+    max_tokens: data.max_tokens ?? null,
+    top_p: data.top_p ?? null,
     output_schema: data.output_schema,
     config_type: data.config_type as ModelConfigEnum,
     is_default: data.is_default,
-    max_tool_rounds: data.max_tool_rounds,
+    // max_tool_rounds: data.max_tool_rounds,
   }
 }
 

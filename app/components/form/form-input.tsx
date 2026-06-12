@@ -4,7 +4,7 @@ import { Input } from '@/modules/shadcn/ui/input'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/modules/shadcn/ui/input-group'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/modules/shadcn/ui/tooltip'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
-import { CircleQuestionMark } from 'lucide-react'
+import { CircleQuestionMark, X } from 'lucide-react'
 import { ComponentProps } from 'react'
 import { cn } from '@shadcn/lib/utils'
 
@@ -27,6 +27,10 @@ interface FormInputProps extends Omit<ComponentProps<typeof Input>, 'name'> {
     icon: React.ReactNode
     position?: 'left' | 'right'
   }
+  trailing?: {
+    icon: React.ReactNode | string
+    onClick: () => void
+  }
 }
 
 export const FormInput = ({
@@ -38,6 +42,7 @@ export const FormInput = ({
   rules,
   addon,
   onChange,
+  trailing,
   ...props
 }: FormInputProps) => {
   const { form } = useFormContext()
@@ -93,21 +98,32 @@ export const FormInput = ({
                 )}
               </div>
             )}
-            <FormControl>
-              {addon ? (
-                <InputGroup className="rounded-sm border-none bg-gray-100">
-                  <InputGroupInput {...fieldProps} {...props} onChange={handleChange} />
-                  {addon && (
-                    <InputGroupAddon
-                      align={addon?.position === 'right' ? 'inline-end' : 'inline-start'}>
-                      {addon?.icon}
-                    </InputGroupAddon>
-                  )}
-                </InputGroup>
-              ) : (
-                <Input {...fieldProps} {...props} onChange={handleChange} />
+            <div className="relative">
+              <FormControl>
+                {addon ? (
+                  <InputGroup className="rounded-sm border-none bg-gray-100">
+                    <InputGroupInput {...fieldProps} {...props} onChange={handleChange} />
+                    {addon && (
+                      <InputGroupAddon
+                        align={addon?.position === 'right' ? 'inline-end' : 'inline-start'}>
+                        {addon?.icon}
+                      </InputGroupAddon>
+                    )}
+                  </InputGroup>
+                ) : (
+                  <Input {...fieldProps} {...props} onChange={handleChange} />
+                )}
+              </FormControl>
+              {trailing && !!fieldProps.value && (
+                <button
+                  type="button"
+                  onClick={trailing.onClick}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground
+                    hover:text-foreground cursor-pointer">
+                  {trailing.icon}
+                </button>
               )}
-            </FormControl>
+            </div>
             {!hideError && <FormMessage />}
           </FormItem>
         )
