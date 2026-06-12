@@ -2,7 +2,6 @@ export type {
   ModelConfigData,
   ModelConfigType,
   UpdateModelConfigData,
-  ModelConfigEnum,
   AttachModelConfigMCPServerData,
   LLMModel,
   LLMProvider,
