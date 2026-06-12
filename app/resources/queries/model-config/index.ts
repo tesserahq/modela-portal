@@ -6,6 +6,8 @@ export type {
   AttachModelConfigMCPServerData,
   LLMModel,
   LLMProvider,
+  ModelConfigFormData,
+  ModelConfigPromptType,
 } from './model-config.type'
 export {
   modelConfigToFormValues,
@@ -31,4 +33,5 @@ export {
   createModelConfigMCPServer,
   deleteModelConfigMCPServer,
   getLLMProviders,
+  getModelConfigPromptType,
 } from './model-config.queries'

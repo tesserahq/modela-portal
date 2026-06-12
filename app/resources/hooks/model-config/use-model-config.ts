@@ -16,6 +16,7 @@ import {
   createModelConfigMCPServer,
   deleteModelConfigMCPServer,
   getLLMProviders,
+  getModelConfigPromptType,
 } from '@/resources/queries/model-config/model-config.queries'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'tessera-ui/components'
@@ -43,6 +44,7 @@ export const contextSourceQueryKeys = {
   mcpServersList: (id: string, params: IQueryParams) =>
     [...contextSourceQueryKeys.mcpServers(), id, params] as const,
   llmProviders: () => [...contextSourceQueryKeys.all, 'providers'] as const,
+  promptType: () => [...contextSourceQueryKeys.all, 'prompt-type'] as const,
 }
 
 export function useModelConfigs(
@@ -308,6 +310,34 @@ export function useLLMProviders(
         }
 
         return await getLLMProviders(config)
+      } catch (error: any) {
+        throw new QueryError(error)
+      }
+    },
+    staleTime: options?.staleTime || 5 * 60 * 1000,
+    enabled: options?.enabled !== false && !!config.token,
+  })
+}
+
+export function useModelConfigPromptType(
+  config: IQueryConfig,
+  params?: IQueryParams,
+  options?: {
+    enabled?: boolean
+    staleTime?: number
+  }
+) {
+  return useQuery({
+    queryKey: contextSourceQueryKeys.promptType(),
+    queryFn: async () => {
+      try {
+        if (!config.token) {
+          throw new QueryError('Token is required', 'TOKEN_REQUIRED')
+        }
+
+        const param = params ?? { size: 100, page: 1 }
+
+        return await getModelConfigPromptType(config, param)
       } catch (error: any) {
         throw new QueryError(error)
       }
