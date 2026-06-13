@@ -71,7 +71,7 @@ export const modelConfigSchema = (limits?: ModelConfigLimits) =>
     ),
 
     output_schema: z.record(z.string(), z.unknown()).optional(),
-    config_type: z.enum(['chat', 'summary', 'generation']).default('chat'),
+    config_type: z.string().default('chat'),
     is_default: z.boolean().default(false),
   })
 

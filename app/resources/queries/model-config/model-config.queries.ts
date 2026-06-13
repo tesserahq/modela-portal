@@ -7,6 +7,7 @@ import {
   ModelConfigType,
   UpdateModelConfigData,
   LLMProvider,
+  ModelConfigPromptType,
 } from './model-config.type'
 import { McpServerType } from '../mcp-servers/mcp-server.type'
 
@@ -125,4 +126,19 @@ export async function getLLMProviders(config: IQueryConfig): Promise<LLMProvider
   })
 
   return res as LLMProvider[]
+}
+
+export async function getModelConfigPromptType(
+  config: IQueryConfig,
+  params: IQueryParams
+): Promise<IPaging<ModelConfigPromptType>> {
+  const { apiUrl, token, nodeEnv } = config
+  const { page, size } = params
+
+  const res = await fetchApi(`${apiUrl}${RESOURCE_URL}/types`, token, nodeEnv, {
+    method: 'GET',
+    pagination: { page, size },
+  })
+
+  return res as IPaging<ModelConfigPromptType>
 }

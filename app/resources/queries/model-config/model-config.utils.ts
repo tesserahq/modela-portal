@@ -1,11 +1,6 @@
 import { isEqual } from '@/utils/helpers/comparison.helper'
 import { ModelConfigFormValue } from './model-config.schema'
-import {
-  ModelConfigEnum,
-  ModelConfigFormData,
-  ModelConfigType,
-  UpdateModelConfigData,
-} from './model-config.type'
+import { ModelConfigFormData, ModelConfigType, UpdateModelConfigData } from './model-config.type'
 
 export function modelConfigToFormValues(data: ModelConfigType): ModelConfigFormValue {
   return {
@@ -18,7 +13,7 @@ export function modelConfigToFormValues(data: ModelConfigType): ModelConfigFormV
     max_tokens: data.max_tokens ?? null,
     top_p: data.top_p ?? null,
     output_schema: data.output_schema,
-    config_type: data.config_type as ModelConfigEnum,
+    config_type: data.config_type,
     is_default: data.is_default,
     // max_tool_rounds: data.max_tool_rounds,
   }

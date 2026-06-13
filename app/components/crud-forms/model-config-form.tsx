@@ -16,7 +16,10 @@ import {
 } from '@/resources/queries/model-config'
 import { useSystemPrompts } from '@/resources/hooks/system-prompt/use-system-prompt'
 import { Badge } from '@/modules/shadcn/ui/badge'
-import { useLLMProviders } from '@/resources/hooks/model-config/use-model-config'
+import {
+  useLLMProviders,
+  useModelConfigPromptType,
+} from '@/resources/hooks/model-config/use-model-config'
 import { AppPreloader } from '../loader/pre-loader'
 import { useFormContext, UseFormWatch } from 'react-hook-form'
 
@@ -206,6 +209,7 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
   const title = isEditMode ? 'Edit Model Config' : 'New Model Config'
 
   const { data, isLoading } = useSystemPrompts(config, { page: 1, size: 100 })
+  const { data: promptTypes, isLoading: isPromptTypeloading } = useModelConfigPromptType(config)
   const { data: providers, isLoading: isProvidersLoading } = useLLMProviders(config)
 
   const handleSubmit = async (data: ModelConfigFormValue) => {
@@ -219,7 +223,7 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
     }
   }
 
-  if (isLoading || isProvidersLoading) {
+  if (isLoading || isProvidersLoading || isPromptTypeloading) {
     return <AppPreloader className="min-h-screen" />
   }
 
@@ -247,16 +251,22 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             onLimitsChange={setLimits}
           />
           <Form.Switch field="is_default" label="Is Default" />
-          <Form.Select
+          <Form.ComboBox
+            required
             field="config_type"
             label="Config Type"
             placeholder="Select config type"
-            required
-            options={[
-              { label: 'Chat', value: 'chat' },
-              { label: 'Summary', value: 'summary' },
-              { label: 'Generation', value: 'generation' },
-            ]}
+            options={promptTypes?.items ?? []}
+            getOptionId={(p) => p.id}
+            getOptionLabel={(p) => p.name}
+            getSearchValue={(p) => `${p.name} ${p.id}`}
+            renderOption={(p) => (
+              <div className="">
+                <span className="font-medium">{p.name}</span>
+                <p className="text-sm">{p.description}</p>
+              </div>
+            )}
+            isLoading={isPromptTypeloading}
           />
           <Form.ComboBox
             field="system_prompt_id"

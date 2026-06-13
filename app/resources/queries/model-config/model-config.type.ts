@@ -1,5 +1,3 @@
-export type ModelConfigEnum = 'chat' | 'summary' | 'generation'
-
 /**
  * model config type (list/detail item from API)
  */
@@ -13,7 +11,7 @@ export type ModelConfigType = {
   max_tokens: number | null
   top_p: number | null
   output_schema: Record<string, unknown>
-  config_type: ModelConfigEnum
+  config_type: string
   is_default: boolean
   max_tool_rounds: number
   id: string
@@ -87,4 +85,10 @@ type ProviderParameters = {
   top_p: ParameterSpec | null
   max_tokens: ParameterSpec | null
   exclusive_parameter_groups: string[][] | null
+}
+
+export type ModelConfigPromptType = {
+  id: string
+  name: string
+  description: string
 }
