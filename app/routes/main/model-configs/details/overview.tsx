@@ -16,6 +16,7 @@ import {
   useModelConfig,
 } from '@/resources/hooks/model-config/use-model-config'
 import { Badge } from '@/modules/shadcn/ui/badge'
+import { JsonEditor } from '@/components/misc/JSONEditor'
 
 export async function loader({ params }: { params: { modelConfigID: string } }) {
   const apiUrl = process.env.API_URL
@@ -155,11 +156,9 @@ export default function ModelConfiglOverview() {
             <div className="d-item items-start! pb-0! mt-3!">
               <dt className="d-label">Output Schema</dt>
               <dd className="d-content flex-1">
-                <Markdown
-                  className="flex-1 w-full"
-                  valueToCopy={
-                    data?.output_schema
-                  }>{`\`\`\`json\n${JSON.stringify(data?.output_schema, null, 2)}\n\`\`\``}</Markdown>
+                <div className="flex-1 w-full">
+                  <JsonEditor value={JSON.stringify(data?.output_schema, null, 2)} readOnly />
+                </div>
               </dd>
             </div>
           </Activity>
