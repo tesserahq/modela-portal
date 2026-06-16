@@ -17,6 +17,7 @@ export interface ModelConfigLimits {
 
 export const modelConfigSchema = (limits?: ModelConfigLimits) =>
   z.object({
+    id: z.string().optional(),
     slug: z.string().min(1, 'Slug is required').max(255),
     name: z.string().min(1, 'Name is required').max(255),
     provider: z.string().min(1, 'Provider is required').max(100),

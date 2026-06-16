@@ -205,8 +205,7 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
   const navigate = useNavigate()
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
   const [limits, setLimits] = useState<ModelConfigLimits | undefined>()
-  const isEditMode = !!defaultValues
-  const title = isEditMode ? 'Edit Model Config' : 'New Model Config'
+  const title = defaultValues.id ? 'Edit Model Config' : 'New Model Config'
 
   const { data, isLoading } = useSystemPrompts(config, { page: 1, size: 100 })
   const { data: promptTypes, isLoading: isPromptTypeloading } = useModelConfigPromptType(config)
@@ -236,13 +235,7 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
         mode="onChange"
         reValidateMode="onChange">
         <FormLayout title={title}>
-          <Form.Input
-            field="slug"
-            label="Slug"
-            placeholder="Enter slug"
-            required
-            disabled={isEditMode}
-          />
+          <Form.Input field="slug" label="Slug" placeholder="Enter slug" required />
           <Form.Input field="name" label="Name" placeholder="Enter name" autoFocus required />
           <LLMParamsForm
             providers={providers ?? []}

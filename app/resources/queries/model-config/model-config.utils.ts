@@ -4,6 +4,7 @@ import { ModelConfigFormData, ModelConfigType, UpdateModelConfigData } from './m
 
 export function modelConfigToFormValues(data: ModelConfigType): ModelConfigFormValue {
   return {
+    id: data.id,
     slug: data.slug,
     name: data.name,
     provider: data.provider,
