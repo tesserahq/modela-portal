@@ -53,7 +53,7 @@ export function SystemPromptForm({ defaultValues, onSubmit, submitLabel = 'Save'
             maxLength={64}
             required
           />
-          <Form.MarkdownEditor field="content" label="Content" />
+          <Form.MarkdownEditor field="content" label="Content" editorHeight={500} />
           <Form.Textarea field="note" label="Note" placeholder="Enter note" maxLength={512} />
           <div className="flex justify-end gap-2">
             <Button type="button" variant="outline" onClick={() => navigate('/credentials')}>
