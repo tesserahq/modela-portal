@@ -12,6 +12,7 @@ import { FormAutocomplete } from './form-autocomplete'
 import { FormArray } from './form-array'
 import { FormComboBox } from './form-command-custom'
 import { FormSchemaMap } from './form-schema'
+import { FormMarkdownEditor } from './form-markdown-editor'
 
 const FormCompound = Object.assign(Form, {
   Input: FormInput,
@@ -27,6 +28,7 @@ const FormCompound = Object.assign(Form, {
   Provider: FormProvider,
   ComboBox: FormComboBox,
   Schema: FormSchemaMap,
+  MarkdownEditor: FormMarkdownEditor,
 })
 
 export { FormCompound as Form, useFormContext }
