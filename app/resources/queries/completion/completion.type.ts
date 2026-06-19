@@ -17,3 +17,46 @@ export type CompletionRequestType = {
   created_at: string
   updated_at: string
 }
+
+/**
+ * Chat completion message (OpenAI-style)
+ */
+export type ChatMessageRole = 'system' | 'user' | 'assistant' | 'tool'
+
+export type ChatMessage = {
+  role: ChatMessageRole
+  content: string
+}
+
+/**
+ * Chat completion request body (POST /chat/completions)
+ */
+export type ChatCompletionRequest = {
+  model: string
+  messages: ChatMessage[]
+}
+
+/**
+ * Chat completion response (OpenAI-style)
+ */
+export type ChatCompletionChoice = {
+  index: number
+  // message is a flexible object; commonly { role, content }
+  message: Record<string, unknown>
+  finish_reason: string | null
+}
+
+export type ChatCompletionUsage = {
+  prompt_tokens: number
+  completion_tokens: number
+  total_tokens: number
+}
+
+export type ChatCompletionResponse = {
+  id: string
+  object: string
+  created: number
+  model: string
+  choices: ChatCompletionChoice[]
+  usage: ChatCompletionUsage
+}
