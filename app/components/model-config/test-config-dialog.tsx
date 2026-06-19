@@ -54,7 +54,7 @@ export function TestConfigDialog({ open, onOpenChange, config, slug }: TestConfi
   const { mutate: runCompletion, isPending } = useChatCompletion(config, {
     onSuccess: (res) => {
       setResponse(res)
-      toast.success('Chat completion ran successfully', { duration: 3000 })
+      toast.success('Successfully test model config', { duration: 3000 })
     },
   })
 
