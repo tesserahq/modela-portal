@@ -1,9 +1,14 @@
 import { fetchApi } from '@/libraries/fetch'
 import { IQueryConfig, IQueryParams } from '..'
 import { IPaging } from '@/resources/types'
-import { CompletionRequestType } from './completion.type'
+import {
+  ChatCompletionRequest,
+  ChatCompletionResponse,
+  CompletionRequestType,
+} from './completion.type'
 
 const RESOURCE_URL = '/completion-requests'
+const CHAT_COMPLETIONS_URL = '/chat/completions'
 
 export async function getCompletionRequests(
   config: IQueryConfig,
@@ -31,4 +36,18 @@ export async function getCompletionRequest(
   })
 
   return res as CompletionRequestType
+}
+
+export async function createChatCompletion(
+  config: IQueryConfig,
+  body: ChatCompletionRequest
+): Promise<ChatCompletionResponse> {
+  const { apiUrl, token, nodeEnv } = config
+
+  const res = await fetchApi(`${apiUrl}${CHAT_COMPLETIONS_URL}`, token, nodeEnv, {
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+
+  return res as ChatCompletionResponse
 }

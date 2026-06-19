@@ -3,8 +3,8 @@ import { DetailContent } from '@/components/detail-content'
 import { ResourceID, useApp } from 'tessera-ui'
 import { Popover, PopoverContent, PopoverTrigger } from '@/modules/shadcn/ui/popover'
 import { Button } from '@shadcn/ui/button'
-import { Edit, EllipsisVertical, Trash2 } from 'lucide-react'
-import { Activity, useRef } from 'react'
+import { Edit, EllipsisVertical, FlaskConical, Trash2 } from 'lucide-react'
+import { Activity, useRef, useState } from 'react'
 import { useLoaderData, useNavigate, useParams } from 'react-router'
 import { DateTime } from 'tessera-ui/components'
 import DeleteConfirmation, {
@@ -17,6 +17,7 @@ import {
 } from '@/resources/hooks/model-config/use-model-config'
 import { Badge } from '@/modules/shadcn/ui/badge'
 import { JsonEditor } from '@/components/misc/JSONEditor'
+import { TestConfigDialog } from '@/components/model-config/test-config-dialog'
 
 export async function loader({ params }: { params: { modelConfigID: string } }) {
   const apiUrl = process.env.API_URL
@@ -30,6 +31,7 @@ export default function ModelConfiglOverview() {
   const { token } = useApp()
   const navigate = useNavigate()
   const deleteConfirmationRef = useRef<DeleteConfirmationHandle>(null)
+  const [isTestOpen, setIsTestOpen] = useState(false)
 
   const config = { apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv }
 
@@ -72,6 +74,13 @@ export default function ModelConfiglOverview() {
               </Button>
             </PopoverTrigger>
             <PopoverContent align="start" side="left" className="w-40 p-2">
+              <Button
+                variant="ghost"
+                className="flex w-full justify-start gap-2"
+                onClick={() => setIsTestOpen(true)}>
+                <FlaskConical size={18} />
+                <span>Test</span>
+              </Button>
               <Button
                 variant="ghost"
                 className="flex w-full justify-start gap-2"
@@ -199,6 +208,13 @@ export default function ModelConfiglOverview() {
           </Activity>
         </DetailContent>
       </Activity>
+
+      <TestConfigDialog
+        open={isTestOpen}
+        onOpenChange={setIsTestOpen}
+        config={config}
+        slug={data?.slug || ''}
+      />
 
       <DeleteConfirmation ref={deleteConfirmationRef} />
     </div>
