@@ -5,6 +5,7 @@ import {
   deleteMcpServer,
   getMcpServer,
   getMcpServers,
+  getMcpServerTools,
   refreshMcpServerTools,
   updateMcpServer,
 } from '@/resources/queries/mcp-servers/mcp-server.queries'
@@ -35,6 +36,7 @@ export const mcpServerQueryKeys = {
     [...mcpServerQueryKeys.lists(), config, params] as const,
   details: () => [...mcpServerQueryKeys.all, 'detail'] as const,
   detail: (id: string) => [...mcpServerQueryKeys.details(), id] as const,
+  tools: (id: string) => [...mcpServerQueryKeys.all, 'tools', id] as const,
 }
 
 export function useMcpServers(
@@ -78,6 +80,31 @@ export function useMcpServer(
           throw new QueryError('Token is required', 'TOKEN_REQUIRED')
         }
         return await getMcpServer(config, id)
+      } catch (error: any) {
+        throw new QueryError(error?.message ?? String(error))
+      }
+    },
+    staleTime: options?.staleTime ?? 5 * 60 * 1000,
+    enabled: options?.enabled !== false && !!id && !!config.token,
+  })
+}
+
+export function useMcpServerTools(
+  config: IQueryConfig,
+  id: string,
+  options?: {
+    enabled?: boolean
+    staleTime?: number
+  }
+) {
+  return useQuery({
+    queryKey: mcpServerQueryKeys.tools(id),
+    queryFn: async () => {
+      try {
+        if (!config.token) {
+          throw new QueryError('Token is required', 'TOKEN_REQUIRED')
+        }
+        return await getMcpServerTools(config, id)
       } catch (error: any) {
         throw new QueryError(error?.message ?? String(error))
       }
@@ -212,6 +239,7 @@ export function useRefreshMcpServerTools(
     onSuccess: (_, id) => {
       queryClient.invalidateQueries({ queryKey: mcpServerQueryKeys.detail(id) })
       queryClient.invalidateQueries({ queryKey: mcpServerQueryKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: mcpServerQueryKeys.tools(id) })
       toast.success('Tools refreshed successfully', { duration: 3000 })
       options?.onSuccess?.(id)
     },

@@ -45,3 +45,22 @@ export type UpdateMcpServerData = Partial<CreateMcpServerData>
  * MCP server form data (for form submission)
  */
 export type McpServerFormData = CreateMcpServerData
+
+/**
+ * A single tool in an MCP server's catalog (GET /mcp-servers/{id}/tools item)
+ */
+export type McpCatalogTool = {
+  qualified_name: string
+  original_name: string
+  description: string | null
+  input_schema: Record<string, unknown>
+  server_id: string
+}
+
+/**
+ * Response for GET /mcp-servers/{id}/tools
+ */
+export type McpServerToolsResponse = {
+  server_id: string
+  tools: McpCatalogTool[]
+}

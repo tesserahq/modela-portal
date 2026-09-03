@@ -1,11 +1,17 @@
 import { fetchApi } from '@/libraries/fetch'
 import { IPaging } from '@/resources/types'
-import { CreateMcpServerData, McpServerType, UpdateMcpServerData } from './mcp-server.type'
+import {
+  CreateMcpServerData,
+  McpServerToolsResponse,
+  McpServerType,
+  UpdateMcpServerData,
+} from './mcp-server.type'
 import { IQueryConfig, IQueryParams } from '..'
 
 const MCP_SERVERS_ENDPOINT = '/mcp-servers'
 
 const REFRESH_TOOLS_TIMEOUT_MS = 30_000
+const GET_TOOLS_TIMEOUT_MS = 30_000
 
 export async function getMcpServers(
   config: IQueryConfig,
@@ -67,6 +73,46 @@ export async function deleteMcpServer(config: IQueryConfig, id: string): Promise
   await fetchApi(`${apiUrl}${MCP_SERVERS_ENDPOINT}/${id}`, token, nodeEnv, {
     method: 'DELETE',
   })
+}
+
+/**
+ * Fetch the (cached) tool catalog for an MCP server.
+ * Uses AbortController to handle connection timeouts since the API may call out
+ * to the live MCP server if the cache has expired.
+ */
+export async function getMcpServerTools(
+  config: IQueryConfig,
+  id: string
+): Promise<McpServerToolsResponse> {
+  const { apiUrl, token, nodeEnv } = config
+
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), GET_TOOLS_TIMEOUT_MS)
+
+  try {
+    const result = await fetchApi(`${apiUrl}${MCP_SERVERS_ENDPOINT}/${id}/tools`, token, nodeEnv, {
+      method: 'GET',
+      signal: controller.signal,
+    })
+    clearTimeout(timeoutId)
+    return result as McpServerToolsResponse
+  } catch (error) {
+    clearTimeout(timeoutId)
+    if (error instanceof Error) {
+      if (error.name === 'AbortError') {
+        throw new Error(
+          `Loading tools timed out after ${GET_TOOLS_TIMEOUT_MS / 1000} seconds. The MCP server may be unreachable or slow to respond.`
+        )
+      }
+      if (error.message.includes('fetch') || error.message.includes('network')) {
+        throw new Error(
+          'Unable to reach the MCP server. Please check the server URL and that the server is running.'
+        )
+      }
+      throw error
+    }
+    throw error
+  }
 }
 
 /**
