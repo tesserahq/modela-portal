@@ -1,7 +1,7 @@
 import useBreadcrumb from '@/hooks/useBreadcrumbs'
 import { Button } from '@/modules/shadcn/ui/button'
 import { useMcpServer } from '@/resources/hooks/mcp-servers/use-mcp-server'
-import { FileText } from 'lucide-react'
+import { FileText, Wrench } from 'lucide-react'
 import { Outlet, useLoaderData, useLocation, useNavigate, useParams } from 'react-router'
 import { useApp } from 'tessera-ui'
 import { EmptyContent } from 'tessera-ui/components'
@@ -26,6 +26,11 @@ export default function McpServerDetailLayout() {
       title: 'Overview',
       path: `/mcp-servers/${params.mcpServerID}/overview`,
       icon: FileText,
+    },
+    {
+      title: 'Tools',
+      path: `/mcp-servers/${params.mcpServerID}/tools`,
+      icon: Wrench,
     },
   ]
 

@@ -27,6 +27,7 @@ export default [
       route(':mcpServerID', 'routes/main/mcp-servers/details/layout.tsx', [
         index('routes/main/mcp-servers/details/index.tsx'),
         route('overview', 'routes/main/mcp-servers/details/overview.tsx'),
+        route('tools', 'routes/main/mcp-servers/details/tools.tsx'),
       ]),
     ]),
     route('/model-configs', 'routes/main/model-configs/layout.tsx', [
