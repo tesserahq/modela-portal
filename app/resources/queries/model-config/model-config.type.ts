@@ -65,6 +65,9 @@ export type AttachModelConfigMCPServerData = {
 export type LLMModel = {
   id: string
   name: string
+  description: string | null
+  input_price_per_mtok: string | null
+  output_price_per_mtok: string | null
 }
 
 export type LLMProvider = {
