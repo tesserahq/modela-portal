@@ -22,6 +22,17 @@ import {
 } from '@/resources/hooks/model-config/use-model-config'
 import { AppPreloader } from '../loader/pre-loader'
 import { useFormContext, UseFormWatch } from 'react-hook-form'
+import { Alert, AlertDescription } from '@/modules/shadcn/ui/alert'
+import { TriangleAlert } from 'lucide-react'
+
+const PARAM_EXPLANATIONS = {
+  temperature:
+    'How random or "creative" the answers are. Low (near 0) = safe, predictable, to-the-point. High (above 1) = more varied and surprising, but more likely to ramble or go off-topic.',
+  top_p:
+    'A second, alternative way to control randomness — most people leave this alone and only adjust Temperature instead. Some providers only allow one of Temperature or Top P to be set at a time; the form will grey out the other one automatically when that applies.',
+  max_tokens:
+    "The longest a single reply is allowed to be. Leaving this blank means there's no limit — the model could keep writing far longer than needed, which is slower, costs more, and can lead to garbled, glitchy-looking text. We recommend always setting a value here.",
+} as const
 
 function createDefaultChecker(
   watch: UseFormWatch<ModelConfigFormValue>,
@@ -80,15 +91,46 @@ function LLMParamsForm({
     setSelectedProvider(provider)
     onLimitsChange(providerToLimits(provider))
     setValue('model', '')
-    if (provider?.parameters?.temperature?.default != null)
-      setValue('temperature', provider.parameters.temperature.default)
-    if (provider?.parameters?.top_p?.default != null)
-      setValue('top_p', provider.parameters.top_p.default)
+    const switchingProviderExclusive = !!provider?.parameters?.exclusive_parameter_groups?.some(
+      (group) => group.includes('temperature') && group.includes('top_p')
+    )
+    if (switchingProviderExclusive) {
+      // Only one of temperature/top_p can be set for this provider — prefer temperature
+      // (the more commonly tuned parameter) and leave top_p blank, or vice versa if only
+      // top_p has a default. Prevents carrying over a value from the previous provider that
+      // would otherwise leave both fields populated and fail validation on save.
+      if (provider?.parameters?.temperature?.default != null) {
+        setValue('temperature', provider.parameters.temperature.default)
+        setValue('top_p', '' as any)
+      } else if (provider?.parameters?.top_p?.default != null) {
+        setValue('top_p', provider.parameters.top_p.default)
+        setValue('temperature', '' as any)
+      } else {
+        setValue('temperature', '' as any)
+        setValue('top_p', '' as any)
+      }
+    } else {
+      if (provider?.parameters?.temperature?.default != null)
+        setValue('temperature', provider.parameters.temperature.default)
+      if (provider?.parameters?.top_p?.default != null)
+        setValue('top_p', provider.parameters.top_p.default)
+    }
     if (provider?.parameters?.max_tokens?.default != null)
       setValue('max_tokens', provider.parameters.max_tokens.default)
   }
 
   const isDifferentFromDefault = createDefaultChecker(watch, params)
+
+  const hasValue = (value: unknown): boolean =>
+    value !== null && value !== undefined && value !== ''
+
+  const tempTopPExclusive = !!params?.exclusive_parameter_groups?.some(
+    (group) => group.includes('temperature') && group.includes('top_p')
+  )
+  const temperatureValue = watch('temperature')
+  const topPValue = watch('top_p')
+  const topPDisabledByTemperature = tempTopPExclusive && hasValue(temperatureValue)
+  const temperatureDisabledByTopP = tempTopPExclusive && hasValue(topPValue)
 
   return (
     <>
@@ -126,13 +168,18 @@ function LLMParamsForm({
           className="no-num-spinner"
           step={0.1}
           description={
-            params?.temperature
-              ? `min: ${params.temperature.min} · default: ${params.temperature.default} · max: ${params.temperature.max}`
-              : undefined
+            temperatureDisabledByTopP
+              ? `Turned off because Top P is set for this provider — it only allows one of the two. Clear Top P to use Temperature instead.`
+              : params?.temperature
+                ? `${PARAM_EXPLANATIONS.temperature} (allowed range: ${params.temperature.min}–${params.temperature.max}, default: ${params.temperature.default})`
+                : PARAM_EXPLANATIONS.temperature
           }
           min={params?.temperature?.min ?? undefined}
           max={params?.temperature?.max ?? undefined}
-          disabled={!selectedProvider}
+          disabled={!selectedProvider || temperatureDisabledByTopP}
+          onChange={(e) => {
+            if (tempTopPExclusive && e.target.value !== '') setValue('top_p', '' as any)
+          }}
           trailing={
             params?.temperature?.default != null &&
             watch('temperature') !== params?.temperature?.default
@@ -143,29 +190,41 @@ function LLMParamsForm({
               : undefined
           }
         />
-        <Form.Input
-          field="max_tokens"
-          label="Max Tokens"
-          type="number"
-          className="no-num-spinner"
-          description={
-            params?.max_tokens
-              ? `min: ${params.max_tokens.min} · default: ${params.max_tokens.default} · max: ${params.max_tokens.max}`
-              : undefined
-          }
-          min={params?.max_tokens?.min ?? undefined}
-          max={params?.max_tokens?.max ?? undefined}
-          disabled={!selectedProvider}
-          trailing={
-            params?.max_tokens?.default != null &&
-            watch('max_tokens') !== params?.max_tokens?.default
-              ? {
-                  icon: 'default',
-                  onClick: () => setValue('max_tokens', params?.max_tokens?.default ?? undefined),
-                }
-              : undefined
-          }
-        />
+        <div>
+          <Form.Input
+            field="max_tokens"
+            label="Max Tokens"
+            type="number"
+            className="no-num-spinner"
+            description={
+              params?.max_tokens
+                ? `${PARAM_EXPLANATIONS.max_tokens} (allowed range: ${params.max_tokens.min}–${params.max_tokens.max}, default: ${params.max_tokens.default})`
+                : PARAM_EXPLANATIONS.max_tokens
+            }
+            min={params?.max_tokens?.min ?? undefined}
+            max={params?.max_tokens?.max ?? undefined}
+            disabled={!selectedProvider}
+            trailing={
+              params?.max_tokens?.default != null &&
+              watch('max_tokens') !== params?.max_tokens?.default
+                ? {
+                    icon: 'default',
+                    onClick: () => setValue('max_tokens', params?.max_tokens?.default ?? undefined),
+                  }
+                : undefined
+            }
+          />
+          {selectedProvider && !watch('max_tokens') && (
+            <Alert variant="warning" className="mt-2 py-2">
+              <TriangleAlert className="!top-2 !left-2 h-4 w-4" />
+              <AlertDescription className="!pl-6">
+                No length limit is set. Replies could end up much longer than expected, take longer
+                to generate, cost more, and sometimes come back as garbled text. We recommend
+                setting a number here, like 1024.
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
         <Form.Input
           field="top_p"
           label="Top P"
@@ -173,13 +232,18 @@ function LLMParamsForm({
           className="no-num-spinner"
           step={0.1}
           description={
-            params?.top_p
-              ? `min: ${params.top_p.min} · default: ${params.top_p.default} · max: ${params.top_p.max}`
-              : undefined
+            topPDisabledByTemperature
+              ? `Turned off because Temperature is set for this provider — it only allows one of the two. Clear Temperature to use Top P instead.`
+              : params?.top_p
+                ? `${PARAM_EXPLANATIONS.top_p} (allowed range: ${params.top_p.min}–${params.top_p.max}, default: ${params.top_p.default})`
+                : PARAM_EXPLANATIONS.top_p
           }
           min={params?.top_p?.min ?? undefined}
           max={params?.top_p?.max ?? undefined}
-          disabled={!selectedProvider}
+          disabled={!selectedProvider || topPDisabledByTemperature}
+          onChange={(e) => {
+            if (tempTopPExclusive && e.target.value !== '') setValue('temperature', '' as any)
+          }}
           trailing={
             isDifferentFromDefault('top_p')
               ? {
