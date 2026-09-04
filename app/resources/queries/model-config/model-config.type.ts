@@ -67,6 +67,11 @@ export type LLMModel = {
   name: string
 }
 
+export type ProviderCatalogCheckResponse = {
+  task_id: string
+  status: string
+}
+
 export type LLMProvider = {
   id: string
   name: string

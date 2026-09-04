@@ -13,6 +13,7 @@ import {
   AttachModelConfigMCPServerData,
 } from '@/resources/queries/model-config'
 import {
+  checkProviderCatalog,
   createModelConfigMCPServer,
   deleteModelConfigMCPServer,
   getLLMProviders,
@@ -316,6 +317,41 @@ export function useLLMProviders(
     },
     staleTime: options?.staleTime || 5 * 60 * 1000,
     enabled: options?.enabled !== false && !!config.token,
+  })
+}
+
+export function useCheckProviderCatalog(
+  config: IQueryConfig,
+  options?: {
+    onSuccess?: () => void
+    onError?: (error: Error) => void
+  }
+) {
+  return useMutation({
+    mutationFn: async () => {
+      try {
+        if (!config.token) {
+          throw new QueryError('Token is required', 'TOKEN_REQUIRED')
+        }
+
+        return await checkProviderCatalog(config)
+      } catch (error: any) {
+        throw new QueryError(error)
+      }
+    },
+    onSuccess: () => {
+      toast.success(
+        'Model catalog check queued — new/removed models will publish an event shortly',
+        {
+          duration: 4000,
+        }
+      )
+      options?.onSuccess?.()
+    },
+    onError: (error: Error) => {
+      toast.error('Failed to trigger model catalog check', { description: error.message })
+      options?.onError?.(error)
+    },
   })
 }
 

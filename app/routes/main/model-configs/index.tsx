@@ -3,6 +3,7 @@ import { AppPreloader } from '@/components/loader/pre-loader'
 import { Badge } from '@/modules/shadcn/ui/badge'
 import { Popover, PopoverContent, PopoverTrigger } from '@/modules/shadcn/ui/popover'
 import {
+  useCheckProviderCatalog,
   useDeleteModelConfig,
   useModelConfigs,
 } from '@/resources/hooks/model-config/use-model-config'
@@ -10,7 +11,7 @@ import { ModelConfigType } from '@/resources/queries/model-config'
 import { ensureCanonicalPagination } from '@/utils/helpers/pagination.helper'
 import { Button } from '@shadcn/ui/button'
 import { ColumnDef } from '@tanstack/react-table'
-import { Edit, EllipsisVertical, EyeIcon, Trash2 } from 'lucide-react'
+import { Edit, EllipsisVertical, EyeIcon, RefreshCw, Trash2 } from 'lucide-react'
 import { useMemo, useRef } from 'react'
 import { Link, useLoaderData, useNavigate } from 'react-router'
 import { ResourceID, useApp } from 'tessera-ui'
@@ -48,6 +49,9 @@ export default function ModelConfigsIndex() {
     { page: pagination.page, size: pagination.size },
     { enabled: !!token && !isLoadingIdenties }
   )
+
+  const { mutate: checkProviderCatalog, isPending: isCheckingCatalog } =
+    useCheckProviderCatalog(config)
 
   const { mutateAsync: deleteModelConfig } = useDeleteModelConfig(config, {
     onSuccess: () => {
@@ -255,11 +259,20 @@ export default function ModelConfigsIndex() {
     <div className="h-full page-content">
       <div className="mb-5 flex items-center justify-between">
         <h1 className="page-title">Model Configs</h1>
-        <NewButton
-          label="New Credential"
-          onClick={() => navigate('/model-configs/new')}
-          disabled={isLoading}
-        />
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            onClick={() => checkProviderCatalog()}
+            disabled={isCheckingCatalog}>
+            <RefreshCw size={16} className={isCheckingCatalog ? 'animate-spin' : ''} />
+            {isCheckingCatalog ? 'Checking...' : 'Check for model updates'}
+          </Button>
+          <NewButton
+            label="New Credential"
+            onClick={() => navigate('/model-configs/new')}
+            disabled={isLoading}
+          />
+        </div>
       </div>
 
       <DataTable columns={columns} data={data?.items || []} meta={meta} isLoading={isLoading} />
