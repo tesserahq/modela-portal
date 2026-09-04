@@ -70,6 +70,11 @@ export type LLMModel = {
   output_price_per_mtok: string | null
 }
 
+export type ProviderCatalogCheckResponse = {
+  task_id: string
+  status: string
+}
+
 export type LLMProvider = {
   id: string
   name: string

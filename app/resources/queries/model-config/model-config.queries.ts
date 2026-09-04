@@ -8,6 +8,7 @@ import {
   UpdateModelConfigData,
   LLMProvider,
   ModelConfigPromptType,
+  ProviderCatalogCheckResponse,
 } from './model-config.type'
 import { McpServerType } from '../mcp-servers/mcp-server.type'
 
@@ -126,6 +127,18 @@ export async function getLLMProviders(config: IQueryConfig): Promise<LLMProvider
   })
 
   return res as LLMProvider[]
+}
+
+export async function checkProviderCatalog(
+  config: IQueryConfig
+): Promise<ProviderCatalogCheckResponse> {
+  const { apiUrl, token, nodeEnv } = config
+
+  const res = await fetchApi(`${apiUrl}/providers/check-catalog`, token, nodeEnv, {
+    method: 'POST',
+  })
+
+  return res as ProviderCatalogCheckResponse
 }
 
 export async function getModelConfigPromptType(
