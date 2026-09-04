@@ -16,6 +16,7 @@ import {
 } from '@/resources/queries/model-config'
 import { useSystemPrompts } from '@/resources/hooks/system-prompt/use-system-prompt'
 import { Badge } from '@/modules/shadcn/ui/badge'
+import { formatCost } from '../resource-components/analytic/cost-utils'
 import {
   useLLMProviders,
   useModelConfigPromptType,
@@ -154,8 +155,24 @@ function LLMParamsForm({
         options={selectedProvider?.models ?? []}
         getOptionId={(p) => p.id}
         getOptionLabel={(p) => p.name}
-        getSearchValue={(p) => p.name}
-        renderOption={(p) => <span className="font-medium">{p.name}</span>}
+        getSearchValue={(p) => `${p.name} ${p.description ?? ''}`}
+        renderOption={(p) => (
+          <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-2">
+              <span className="font-medium">{p.name}</span>
+              {(p.input_price_per_mtok || p.output_price_per_mtok) && (
+                <Badge variant="outline" className="py-0">
+                  <span className="text-xs">
+                    {p.input_price_per_mtok ? formatCost(p.input_price_per_mtok) : '—'} in /{' '}
+                    {p.output_price_per_mtok ? formatCost(p.output_price_per_mtok) : '—'} out per
+                    MTok
+                  </span>
+                </Badge>
+              )}
+            </div>
+            {p.description && <p className="text-sm">{p.description}</p>}
+          </div>
+        )}
         isLoading={isProvidersLoading}
         disabled={!selectedProvider}
         required
