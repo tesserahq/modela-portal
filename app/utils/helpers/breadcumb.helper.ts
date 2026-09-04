@@ -2,12 +2,17 @@ import { CredentialType } from '@/resources/queries/credentials/credential.type'
 import { McpServerType } from '@/resources/queries/mcp-servers/mcp-server.type'
 import { BreadcrumbItemData } from 'tessera-ui/layouts'
 import { ModelConfigType } from '@/resources/queries/model-config'
+import { KnowledgeDocumentType } from '@/resources/queries/knowledge-documents'
 
 /**
  * Union type of all possible resource data types
  * Add more resource types here as you implement them
  */
-export type BreadcrumbResourceData = CredentialType | ModelConfigType | McpServerType
+export type BreadcrumbResourceData =
+  | CredentialType
+  | ModelConfigType
+  | McpServerType
+  | KnowledgeDocumentType
 
 /**
  * Configuration for breadcrumb generation

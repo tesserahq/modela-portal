@@ -7,6 +7,8 @@ export type {
   LLMProvider,
   ModelConfigFormData,
   ModelConfigPromptType,
+  ModelConfigTypeName,
+  EmbeddingConfigParams,
 } from './model-config.type'
 export {
   modelConfigToFormValues,

@@ -14,6 +14,8 @@ export function modelConfigToFormValues(data: ModelConfigType): ModelConfigFormV
     max_tokens: data.max_tokens ?? null,
     top_p: data.top_p ?? null,
     output_schema: data.output_schema,
+    params: data.params as ModelConfigFormValue['params'],
+    enabled_tools: data.enabled_tools ?? [],
     config_type: data.config_type,
     is_default: data.is_default,
     // max_tool_rounds: data.max_tool_rounds,
@@ -21,13 +23,20 @@ export function modelConfigToFormValues(data: ModelConfigType): ModelConfigFormV
 }
 
 export function formValuesToModelConfig(formValues: ModelConfigFormValue): ModelConfigFormData {
-  const { slug, name, provider, model, ...optional } = formValues
+  const { id: _id, slug, name, provider, model, ...optional } = formValues
   return {
     slug,
     name,
     provider,
     model,
     ...optional,
+    params: formValues.config_type === 'embedding' ? (formValues.params ?? null) : null,
+    enabled_tools: formValues.config_type === 'chat' ? (formValues.enabled_tools ?? []) : null,
+    system_prompt_id: formValues.config_type === 'embedding' ? null : formValues.system_prompt_id,
+    temperature: formValues.config_type === 'embedding' ? null : formValues.temperature,
+    max_tokens: formValues.config_type === 'embedding' ? null : formValues.max_tokens,
+    top_p: formValues.config_type === 'embedding' ? null : formValues.top_p,
+    output_schema: formValues.config_type === 'embedding' ? {} : formValues.output_schema,
   }
 }
 
@@ -50,6 +59,8 @@ export function getChangedModelConfigUpdateData(
     'max_tokens',
     'top_p',
     'output_schema',
+    'params',
+    'enabled_tools',
     'config_type',
     'is_default',
     'max_tool_rounds',
