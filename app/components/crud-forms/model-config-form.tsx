@@ -22,6 +22,17 @@ import {
 } from '@/resources/hooks/model-config/use-model-config'
 import { AppPreloader } from '../loader/pre-loader'
 import { useFormContext, UseFormWatch } from 'react-hook-form'
+import { Alert, AlertDescription } from '@/modules/shadcn/ui/alert'
+import { TriangleAlert } from 'lucide-react'
+
+const PARAM_EXPLANATIONS = {
+  temperature:
+    'How random or "creative" the answers are. Low (near 0) = safe, predictable, to-the-point. High (above 1) = more varied and surprising, but more likely to ramble or go off-topic.',
+  top_p:
+    'A second, alternative way to control randomness — most people leave this alone and only adjust Temperature instead. Use one or the other, not both; some providers will reject a config that sets both.',
+  max_tokens:
+    "The longest a single reply is allowed to be. Leaving this blank means there's no limit — the model could keep writing far longer than needed, which is slower, costs more, and can lead to garbled, glitchy-looking text. We recommend always setting a value here.",
+} as const
 
 function createDefaultChecker(
   watch: UseFormWatch<ModelConfigFormValue>,
@@ -127,8 +138,8 @@ function LLMParamsForm({
           step={0.1}
           description={
             params?.temperature
-              ? `min: ${params.temperature.min} · default: ${params.temperature.default} · max: ${params.temperature.max}`
-              : undefined
+              ? `${PARAM_EXPLANATIONS.temperature} (allowed range: ${params.temperature.min}–${params.temperature.max}, default: ${params.temperature.default})`
+              : PARAM_EXPLANATIONS.temperature
           }
           min={params?.temperature?.min ?? undefined}
           max={params?.temperature?.max ?? undefined}
@@ -143,29 +154,41 @@ function LLMParamsForm({
               : undefined
           }
         />
-        <Form.Input
-          field="max_tokens"
-          label="Max Tokens"
-          type="number"
-          className="no-num-spinner"
-          description={
-            params?.max_tokens
-              ? `min: ${params.max_tokens.min} · default: ${params.max_tokens.default} · max: ${params.max_tokens.max}`
-              : undefined
-          }
-          min={params?.max_tokens?.min ?? undefined}
-          max={params?.max_tokens?.max ?? undefined}
-          disabled={!selectedProvider}
-          trailing={
-            params?.max_tokens?.default != null &&
-            watch('max_tokens') !== params?.max_tokens?.default
-              ? {
-                  icon: 'default',
-                  onClick: () => setValue('max_tokens', params?.max_tokens?.default ?? undefined),
-                }
-              : undefined
-          }
-        />
+        <div>
+          <Form.Input
+            field="max_tokens"
+            label="Max Tokens"
+            type="number"
+            className="no-num-spinner"
+            description={
+              params?.max_tokens
+                ? `${PARAM_EXPLANATIONS.max_tokens} (allowed range: ${params.max_tokens.min}–${params.max_tokens.max}, default: ${params.max_tokens.default})`
+                : PARAM_EXPLANATIONS.max_tokens
+            }
+            min={params?.max_tokens?.min ?? undefined}
+            max={params?.max_tokens?.max ?? undefined}
+            disabled={!selectedProvider}
+            trailing={
+              params?.max_tokens?.default != null &&
+              watch('max_tokens') !== params?.max_tokens?.default
+                ? {
+                    icon: 'default',
+                    onClick: () => setValue('max_tokens', params?.max_tokens?.default ?? undefined),
+                  }
+                : undefined
+            }
+          />
+          {selectedProvider && !watch('max_tokens') && (
+            <Alert variant="warning" className="mt-2 py-2">
+              <TriangleAlert className="!top-2 !left-2 h-4 w-4" />
+              <AlertDescription className="!pl-6">
+                No length limit is set. Replies could end up much longer than expected, take
+                longer to generate, cost more, and sometimes come back as garbled text. We
+                recommend setting a number here, like 1024.
+              </AlertDescription>
+            </Alert>
+          )}
+        </div>
         <Form.Input
           field="top_p"
           label="Top P"
@@ -174,8 +197,8 @@ function LLMParamsForm({
           step={0.1}
           description={
             params?.top_p
-              ? `min: ${params.top_p.min} · default: ${params.top_p.default} · max: ${params.top_p.max}`
-              : undefined
+              ? `${PARAM_EXPLANATIONS.top_p} (allowed range: ${params.top_p.min}–${params.top_p.max}, default: ${params.top_p.default})`
+              : PARAM_EXPLANATIONS.top_p
           }
           min={params?.top_p?.min ?? undefined}
           max={params?.top_p?.max ?? undefined}
