@@ -121,7 +121,8 @@ function LLMParamsForm({
 
   const isDifferentFromDefault = createDefaultChecker(watch, params)
 
-  const hasValue = (value: unknown): boolean => value !== null && value !== undefined && value !== ''
+  const hasValue = (value: unknown): boolean =>
+    value !== null && value !== undefined && value !== ''
 
   const tempTopPExclusive = !!params?.exclusive_parameter_groups?.some(
     (group) => group.includes('temperature') && group.includes('top_p')
