@@ -10,6 +10,7 @@ import {
   CloudCog,
   Database,
   KeyRound,
+  MessageCircle,
   PackageCheck,
   Server,
 } from 'lucide-react'
@@ -106,6 +107,11 @@ export default function PrivateLayout() {
       title: 'Completions',
       path: `/completions`,
       icon: PackageCheck,
+    },
+    {
+      title: 'Chat',
+      path: `/chat`,
+      icon: MessageCircle,
     },
   ]
 
