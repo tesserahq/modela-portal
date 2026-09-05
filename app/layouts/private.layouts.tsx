@@ -39,6 +39,7 @@ export default function PrivateLayout() {
       Boolean(params['promptID']) ||
       Boolean(params['credentialID']) ||
       Boolean(params['completionID']) ||
+      Boolean(params['knowledgeDocumentID']) ||
       Boolean(params['mcpServerID'])) &&
     !isEditPage
 
@@ -90,6 +91,11 @@ export default function PrivateLayout() {
       title: 'MCP Servers',
       path: `/mcp-servers`,
       icon: Server,
+    },
+    {
+      title: 'Knowledge Documents',
+      path: `/knowledge-documents`,
+      icon: Database,
     },
     {
       title: 'Model Configs',

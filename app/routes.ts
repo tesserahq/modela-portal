@@ -11,6 +11,15 @@ export default [
 
   // Private Routes
   layout('layouts/private.layouts.tsx', [
+    route('/knowledge-documents', 'routes/main/knowledge-documents/layout.tsx', [
+      index('routes/main/knowledge-documents/index.tsx'),
+      route('new', 'routes/main/knowledge-documents/new.tsx'),
+      route(':knowledgeDocumentID/edit', 'routes/main/knowledge-documents/edit.tsx'),
+      route(':knowledgeDocumentID', 'routes/main/knowledge-documents/details/layout.tsx', [
+        index('routes/main/knowledge-documents/details/index.tsx'),
+        route('overview', 'routes/main/knowledge-documents/details/overview.tsx'),
+      ]),
+    ]),
     route('/credentials', 'routes/main/credentials/layout.tsx', [
       index('routes/main/credentials/index.tsx'),
       route('new', 'routes/main/credentials/new.tsx'),

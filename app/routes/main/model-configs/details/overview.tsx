@@ -140,6 +140,14 @@ export default function ModelConfiglOverview() {
               )}
             </dd>
           </div>
+          {data?.config_type === 'chat' && (
+            <div className="d-item pb-1!">
+              <dt className="d-label">Built-in Tools</dt>
+              <dd className="d-content">
+                {data.enabled_tools?.length ? data.enabled_tools.join(', ') : 'None'}
+              </dd>
+            </div>
+          )}
           <div className="d-item pb-1!">
             <dt className="d-label">Temperature</dt>
             <dd className="d-content">{data?.temperature ?? 'N/A'}</dd>
@@ -168,6 +176,14 @@ export default function ModelConfiglOverview() {
                 <div className="flex-1 w-full">
                   <JsonEditor value={JSON.stringify(data?.output_schema, null, 2)} readOnly />
                 </div>
+              </dd>
+            </div>
+          </Activity>
+          <Activity mode={data?.config_type === 'embedding' && data?.params ? 'visible' : 'hidden'}>
+            <div className="d-item items-start! pb-0! mt-3!">
+              <dt className="d-label">Embedding Parameters</dt>
+              <dd className="d-content flex-1">
+                <JsonEditor value={JSON.stringify(data?.params, null, 2)} readOnly />
               </dd>
             </div>
           </Activity>

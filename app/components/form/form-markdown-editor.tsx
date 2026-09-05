@@ -17,6 +17,7 @@ interface FormMarkdownEditorProps {
   hideError?: boolean
   editorHeight?: number
   autoFocus?: boolean
+  showPreview?: boolean
   rules?: {
     required?: boolean | string
     minLength?: number | { value: number; message: string }
@@ -33,6 +34,7 @@ export const FormMarkdownEditor = ({
   hideError = false,
   editorHeight,
   autoFocus,
+  showPreview,
   rules,
 }: FormMarkdownEditorProps) => {
   const { form } = useFormContext()
@@ -63,6 +65,7 @@ export const FormMarkdownEditor = ({
               onUpdateChange={fieldProps.onChange}
               editorHeight={editorHeight}
               autofocus={autoFocus}
+              showPreview={showPreview}
             />
           </FormControl>
           {!hideError && <FormMessage />}

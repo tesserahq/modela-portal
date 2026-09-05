@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+import { markdown } from '@codemirror/lang-markdown'
+import CodeMirror, { EditorView } from '@uiw/react-codemirror'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@shadcn/ui/tabs'
 import { cn } from '@shadcn/lib/utils'
 import { Markdown } from './markdown'
@@ -10,6 +11,7 @@ interface IProps {
   name?: string
   display?: 'row' | 'col'
   autofocus?: boolean
+  showPreview?: boolean
 }
 
 export default function MarkdownEditor({
@@ -19,13 +21,8 @@ export default function MarkdownEditor({
   name,
   display = 'row',
   autofocus = false,
+  showPreview = true,
 }: IProps) {
-  const onChange = (event: any) => {
-    const value = event.target.value
-
-    onUpdateChange(value)
-  }
-
   return (
     <div
       className={cn(
@@ -35,7 +32,8 @@ export default function MarkdownEditor({
       <Tabs
         defaultValue="markdown"
         className="w-full overflow-hidden rounded-sm border border-input bg-muted">
-        <TabsList className="h-8 gap-0 border-none bg-transparent p-0">
+        <TabsList
+          className={cn('h-8 gap-0 border-none bg-transparent p-0', !showPreview && 'hidden')}>
           <TabsTrigger
             value="markdown"
             className="rounded-none !border-transparent py-2 text-xs !shadow-none
@@ -44,36 +42,40 @@ export default function MarkdownEditor({
               data-[state=active]:bg-white data-[state=active]:dark:bg-slate-800">
             Write
           </TabsTrigger>
-          <TabsTrigger
-            value="preview"
-            className="rounded-none !border-transparent py-2 text-xs !shadow-none
-              hover:bg-transparent data-[state=active]:rounded-tl-sm
-              data-[state=active]:rounded-tr-sm data-[state=active]:!border-input
-              data-[state=active]:!border-b-transparent data-[state=active]:bg-white
-              data-[state=active]:dark:bg-slate-800">
-            Preview
-          </TabsTrigger>
+          {showPreview && (
+            <TabsTrigger
+              value="preview"
+              className="rounded-none !border-transparent py-2 text-xs !shadow-none
+                hover:bg-transparent data-[state=active]:rounded-tl-sm
+                data-[state=active]:rounded-tr-sm data-[state=active]:!border-input
+                data-[state=active]:!border-b-transparent data-[state=active]:bg-white
+                data-[state=active]:dark:bg-slate-800">
+              Preview
+            </TabsTrigger>
+          )}
         </TabsList>
         <TabsContent
           value="markdown"
-          className="mt-0 border-t border-input bg-white p-3 dark:bg-slate-800">
-          <textarea
-            className="w-full flex-grow resize-none border-none bg-transparent p-0 outline-none"
+          className={cn('mt-0 bg-white dark:bg-slate-800', showPreview && 'border-t border-input')}>
+          <CodeMirror
             value={value}
-            name={name}
+            onChange={onUpdateChange}
+            extensions={[markdown(), EditorView.lineWrapping]}
             autoFocus={autofocus}
-            onChange={onChange}
+            height={`${editorHeight}px`}
+            aria-label={name}
             placeholder="Type here"
-            style={{ height: editorHeight }}
           />
         </TabsContent>
-        <TabsContent
-          value="preview"
-          className="mt-0 border-t border-input bg-white p-3 dark:bg-slate-800">
-          <div className="overflow-scroll" style={{ height: editorHeight }}>
-            <Markdown>{value}</Markdown>
-          </div>
-        </TabsContent>
+        {showPreview && (
+          <TabsContent
+            value="preview"
+            className="mt-0 border-t border-input bg-white p-3 dark:bg-slate-800">
+            <div className="overflow-scroll" style={{ height: editorHeight }}>
+              <Markdown>{value}</Markdown>
+            </div>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   )

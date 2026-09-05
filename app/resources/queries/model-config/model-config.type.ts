@@ -11,7 +11,9 @@ export type ModelConfigType = {
   max_tokens: number | null
   top_p: number | null
   output_schema: Record<string, unknown>
-  config_type: string
+  params: Record<string, unknown> | null
+  enabled_tools: string[] | null
+  config_type: ModelConfigTypeName
   is_default: boolean
   max_tool_rounds: number
   id: string
@@ -36,6 +38,8 @@ export type ModelConfigData = Pick<ModelConfigType, 'slug' | 'name' | 'provider'
       | 'max_tokens'
       | 'top_p'
       | 'output_schema'
+      | 'params'
+      | 'enabled_tools'
       | 'config_type'
       | 'is_default'
       | 'max_tool_rounds'
@@ -79,6 +83,11 @@ export type LLMProvider = {
   id: string
   name: string
   models: LLMModel[]
+  embedding_models?: LLMModel[]
+  capabilities?: {
+    chat?: boolean
+    embeddings?: boolean
+  }
   parameters: ProviderParameters | null
 }
 
@@ -99,4 +108,11 @@ export type ModelConfigPromptType = {
   id: string
   name: string
   description: string
+}
+export type ModelConfigTypeName = 'chat' | 'summary' | 'generation' | 'scan' | 'embedding'
+
+export type EmbeddingConfigParams = {
+  chunk_size: number
+  chunk_overlap: number
+  strategy: 'fixed_size'
 }
