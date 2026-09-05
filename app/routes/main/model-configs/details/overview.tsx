@@ -183,7 +183,9 @@ export default function ModelConfiglOverview() {
             <div className="d-item items-start! pb-0! mt-3!">
               <dt className="d-label">Embedding Parameters</dt>
               <dd className="d-content flex-1">
-                <JsonEditor value={JSON.stringify(data?.params, null, 2)} readOnly />
+                <div className="flex-1 w-full">
+                  <JsonEditor value={JSON.stringify(data?.params, null, 2)} readOnly />
+                </div>
               </dd>
             </div>
           </Activity>

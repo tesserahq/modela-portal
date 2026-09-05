@@ -37,7 +37,19 @@ const PARAM_EXPLANATIONS = {
     'A second, alternative way to control randomness — most people leave this alone and only adjust Temperature instead. Some providers only allow one of Temperature or Top P to be set at a time; the form will grey out the other one automatically when that applies.',
   max_tokens:
     "The longest a single reply is allowed to be. Leaving this blank means there's no limit — the model could keep writing far longer than needed, which is slower, costs more, and can lead to garbled, glitchy-looking text. We recommend always setting a value here.",
+  chunk_size:
+    'How much text (in tokens) each embedded chunk covers. Smaller chunks (300–500) give more precise retrieval matches; larger chunks (1000–1500) keep more surrounding context per match but are fuzzier. Must be between 256 and 8192 — the max input size for OpenAI’s embedding models. 1000 is a reasonable default.',
+  chunk_overlap:
+    'How much text neighboring chunks share, so an idea isn’t cut in half at a chunk boundary. A common rule of thumb is 10–20% of chunk size (e.g. 100–200 for a 1000-size chunk). Must be smaller than chunk size.',
+  strategy:
+    'How the document is split into chunks before embedding. "Fixed size" splits into equal-length chunks and is currently the only supported strategy.',
 } as const
+
+const EMBEDDING_PARAM_DEFAULTS = {
+  chunk_size: 1000,
+  chunk_overlap: 100,
+  strategy: 'fixed_size' as const,
+}
 
 function createDefaultChecker(
   watch: UseFormWatch<ModelConfigFormValue>,
@@ -320,6 +332,24 @@ function TypeSpecificFields({
   const configType = form.watch('config_type') as ModelConfigFormValue['config_type']
   const previousType = useRef(configType)
 
+  // Backstops missing/incomplete embedding params. Runs on every render where
+  // configType is "embedding" — including the very first one, e.g. an /edit
+  // page loading straight into an embedding config — not just on a change
+  // away from another type, so the fields are never left blank with no
+  // guidance on what to enter.
+  useEffect(() => {
+    if (configType !== 'embedding') return
+    const current = (form.getValues('params') as Record<string, unknown> | null) ?? {}
+    if (current.chunk_size != null && current.chunk_overlap != null && current.strategy) {
+      return
+    }
+    form.setValue(
+      'params',
+      { ...EMBEDDING_PARAM_DEFAULTS, ...current },
+      { shouldDirty: false, shouldValidate: true }
+    )
+  }, [configType, form])
+
   useEffect(() => {
     if (previousType.current === configType) return
     form.setValue('model', '', { shouldDirty: true, shouldValidate: true })
@@ -329,15 +359,6 @@ function TypeSpecificFields({
       form.setValue('max_tokens', null, { shouldDirty: true })
       form.setValue('top_p', null, { shouldDirty: true })
       form.setValue('output_schema', {}, { shouldDirty: true })
-      form.setValue(
-        'params',
-        form.getValues('params') ?? {
-          chunk_size: 1000,
-          chunk_overlap: 100,
-          strategy: 'fixed_size',
-        },
-        { shouldDirty: true, shouldValidate: true }
-      )
       form.setValue('enabled_tools', null, { shouldDirty: true })
     } else {
       form.setValue('params', null, { shouldDirty: true })
@@ -366,6 +387,7 @@ function TypeSpecificFields({
             type="number"
             min={256}
             max={8192}
+            description={PARAM_EXPLANATIONS.chunk_size}
             required
           />
           <Form.Input
@@ -373,6 +395,7 @@ function TypeSpecificFields({
             label="Chunk overlap"
             type="number"
             min={0}
+            description={PARAM_EXPLANATIONS.chunk_overlap}
             required
           />
         </div>
@@ -380,6 +403,7 @@ function TypeSpecificFields({
           field="params.strategy"
           label="Chunking strategy"
           options={[{ value: 'fixed_size', label: 'Fixed size' }]}
+          description={PARAM_EXPLANATIONS.strategy}
           required
         />
       </div>
