@@ -71,6 +71,8 @@ export default [
       ]),
     ]),
 
+    route('/chat', 'routes/main/chat/index.tsx'),
+
     route('/analytics', 'routes/main/analytics/index.tsx'),
   ]),
 
