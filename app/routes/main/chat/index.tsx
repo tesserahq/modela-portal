@@ -1,6 +1,7 @@
 import { DetailContent } from '@/components/detail-content'
+import { DomainEventCard } from '@/components/chat/domain-event-card'
 import { AppPreloader } from '@/components/loader/pre-loader'
-import { ModelaChatTransport } from '@/libraries/modela-chat-transport'
+import { ModelaChatTransport, type ModelaUIMessage } from '@/libraries/modela-chat-transport'
 import { useChat } from '@ai-sdk/react'
 import { Button } from '@shadcn/ui/button'
 import { Textarea } from '@shadcn/ui/textarea'
@@ -40,7 +41,7 @@ function ChatPageContent({
   input: string
   setInput: (value: string) => void
 }) {
-  const { messages, sendMessage, status, error } = useChat({ transport })
+  const { messages, sendMessage, status, error } = useChat<ModelaUIMessage>({ transport })
   const scrollRef = useRef<HTMLDivElement>(null)
   const isBusy = status === 'submitted' || status === 'streaming'
 
@@ -77,10 +78,15 @@ function ChatPageContent({
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-muted text-foreground'
               )}>
-              {message.parts
-                .filter((part) => part.type === 'text')
-                .map((part) => part.text)
-                .join('')}
+              {message.parts.map((part, index) => {
+                if (part.type === 'text') {
+                  return <span key={index}>{part.text}</span>
+                }
+                if (part.type === 'data-event') {
+                  return <DomainEventCard key={part.id ?? part.data.id} event={part.data} />
+                }
+                return null
+              })}
             </div>
           </div>
         ))}

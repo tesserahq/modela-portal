@@ -18,6 +18,7 @@ export function modelConfigToFormValues(data: ModelConfigType): ModelConfigFormV
     enabled_tools: data.enabled_tools ?? [],
     config_type: data.config_type,
     is_default: data.is_default,
+    expose_events: data.expose_events,
     // max_tool_rounds: data.max_tool_rounds,
   }
 }
@@ -63,6 +64,7 @@ export function getChangedModelConfigUpdateData(
     'enabled_tools',
     'config_type',
     'is_default',
+    'expose_events',
     'max_tool_rounds',
   ]
 

@@ -94,6 +94,7 @@ export const modelConfigSchema = (limits?: ModelConfigLimits) =>
       enabled_tools: z.array(z.string()).nullable().optional(),
       config_type: modelConfigTypeSchema.default('chat'),
       is_default: z.boolean().default(false),
+      expose_events: z.boolean().default(false),
     })
     .superRefine((value, context) => {
       if (value.config_type !== 'embedding') return
@@ -147,6 +148,7 @@ export const modelConfigFormDefaultValue: ModelConfigFormValue = {
   enabled_tools: [],
   config_type: 'chat',
   is_default: false,
+  expose_events: false,
 }
 
 export const modelConfigMCPServerSchema = z.object({
