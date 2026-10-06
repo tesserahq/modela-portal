@@ -13,6 +13,7 @@ const base = {
   top_p: null,
   output_schema: {},
   is_default: false,
+  expose_events: false,
 }
 
 describe('model config conditional fields', () => {
@@ -35,6 +36,19 @@ describe('model config conditional fields', () => {
     })
     expect(payload.params).toBeNull()
     expect(payload.enabled_tools).toEqual(['search_knowledge_base'])
+    expect(payload.expose_events).toBe(false)
+  })
+
+  it('preserves the event exposure setting in chat payloads', () => {
+    const payload = formValuesToModelConfig({
+      ...base,
+      expose_events: true,
+      config_type: 'chat',
+      params: null,
+      enabled_tools: [],
+    })
+
+    expect(payload.expose_events).toBe(true)
   })
 
   it('strips enabled tools from embedding payloads', () => {

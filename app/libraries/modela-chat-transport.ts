@@ -1,4 +1,7 @@
 import type { ChatTransport, UIMessage, UIMessageChunk } from 'ai'
+import { type ModelaChatData, type ModelaEvent, modelaEventSchema } from './modela-events'
+
+export type ModelaUIMessage = UIMessage<unknown, ModelaChatData>
 
 export interface ModelaChatTransportOptions {
   /** Modela API base URL. */
@@ -12,7 +15,7 @@ export interface ModelaChatTransportOptions {
  * Modela returns OpenAI-compatible SSE events, which are converted into
  * the UIMessageChunk events that useChat expects.
  */
-export class ModelaChatTransport implements ChatTransport<UIMessage> {
+export class ModelaChatTransport implements ChatTransport<ModelaUIMessage> {
   private apiUrl: string
   private token: string
 
@@ -22,8 +25,8 @@ export class ModelaChatTransport implements ChatTransport<UIMessage> {
   }
 
   async sendMessages(
-    options: Parameters<ChatTransport<UIMessage>['sendMessages']>[0]
-  ): Promise<ReadableStream<UIMessageChunk>> {
+    options: Parameters<ChatTransport<ModelaUIMessage>['sendMessages']>[0]
+  ): Promise<ReadableStream<UIMessageChunk<unknown, ModelaChatData>>> {
     const { messages, abortSignal } = options
 
     const openAiMessages = messages
@@ -46,6 +49,7 @@ export class ModelaChatTransport implements ChatTransport<UIMessage> {
       body: JSON.stringify({
         messages: openAiMessages,
         stream: true,
+        include: ['events'],
       }),
       signal: abortSignal,
     })
@@ -67,7 +71,7 @@ export class ModelaChatTransport implements ChatTransport<UIMessage> {
 /** Parses Modela's OpenAI-compatible SSE body into UIMessageChunk events. */
 function modelaSseToUIMessageChunks(
   body: ReadableStream<Uint8Array>
-): ReadableStream<UIMessageChunk> {
+): ReadableStream<UIMessageChunk<unknown, ModelaChatData>> {
   const reader = body.getReader()
   const decoder = new TextDecoder()
   let buffer = ''
@@ -75,7 +79,9 @@ function modelaSseToUIMessageChunks(
   let started = false
   let finished = false
 
-  const finish = (controller: ReadableStreamDefaultController<UIMessageChunk>) => {
+  const finish = (
+    controller: ReadableStreamDefaultController<UIMessageChunk<unknown, ModelaChatData>>
+  ) => {
     if (finished) return
     finished = true
     if (textPartId) {
@@ -86,7 +92,7 @@ function modelaSseToUIMessageChunks(
     controller.close()
   }
 
-  return new ReadableStream<UIMessageChunk>({
+  return new ReadableStream<UIMessageChunk<unknown, ModelaChatData>>({
     async pull(controller) {
       if (finished) return
 
@@ -112,6 +118,7 @@ function modelaSseToUIMessageChunks(
 
         let chunk: {
           choices?: { delta?: { role?: string; content?: string }; finish_reason?: string | null }[]
+          extensions?: { event?: unknown }
         }
         try {
           chunk = JSON.parse(data)
@@ -123,6 +130,18 @@ function modelaSseToUIMessageChunks(
         if (!started) {
           controller.enqueue({ type: 'start' })
           started = true
+        }
+
+        if (chunk.extensions?.event !== undefined) {
+          const parsedEvent = modelaEventSchema.safeParse(chunk.extensions.event)
+          if (!parsedEvent.success) {
+            controller.enqueue({
+              type: 'error',
+              errorText: 'Modela returned an invalid domain event.',
+            })
+            continue
+          }
+          controller.enqueue(toEventChunk(parsedEvent.data))
         }
 
         const delta = chunk.choices?.[0]?.delta
@@ -139,4 +158,12 @@ function modelaSseToUIMessageChunks(
       reader.cancel()
     },
   })
+}
+
+function toEventChunk(event: ModelaEvent): UIMessageChunk<unknown, ModelaChatData> {
+  return {
+    type: 'data-event',
+    id: event.id,
+    data: event,
+  }
 }

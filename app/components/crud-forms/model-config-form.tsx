@@ -466,6 +466,18 @@ function TypeSpecificFields({
   )
 }
 
+function ChatEventExposureField() {
+  const { watch } = useFormContext<ModelConfigFormValue>()
+  if (watch('config_type') !== 'chat') return null
+  return (
+    <Form.Switch
+      field="expose_events"
+      label="Expose domain events"
+      description="Allow opted-in chat clients to receive validated domain events emitted by MCP tools."
+    />
+  )
+}
+
 function NonEmbeddingFields({ children }: { children: ReactNode }) {
   const { watch } = useFormContext<ModelConfigFormValue>()
   return watch('config_type') === 'embedding' ? null : children
@@ -551,6 +563,7 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
             onLimitsChange={setLimits}
           />
           <Form.Switch field="is_default" label="Is Default" />
+          <ChatEventExposureField />
           <TypeSpecificFields
             tools={tools ?? []}
             isToolsLoading={isToolsLoading}

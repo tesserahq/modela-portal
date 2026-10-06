@@ -15,6 +15,7 @@ export type ModelConfigType = {
   enabled_tools: string[] | null
   config_type: ModelConfigTypeName
   is_default: boolean
+  expose_events: boolean
   max_tool_rounds: number
   id: string
   created_at: string
@@ -42,6 +43,7 @@ export type ModelConfigData = Pick<ModelConfigType, 'slug' | 'name' | 'provider'
       | 'enabled_tools'
       | 'config_type'
       | 'is_default'
+      | 'expose_events'
       | 'max_tool_rounds'
     >
   >
