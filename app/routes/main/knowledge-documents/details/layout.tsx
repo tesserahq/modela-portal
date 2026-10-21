@@ -28,9 +28,9 @@ export default function KnowledgeDocumentDetailLayout() {
   const breadcrumbs = useBreadcrumb({
     pathname,
     params,
-    apiUrl,
+    apiUrl: apiUrl!,
     nodeEnv,
-    token: token ?? undefined,
+    token: token!,
   })
   const menuItems: DetailItemsProps[] = [
     { title: 'Overview', path: `/knowledge-documents/${id}/overview`, icon: FileText },

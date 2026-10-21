@@ -34,18 +34,18 @@ class QueryError extends Error {
   }
 }
 
-export const contextSourceQueryKeys = {
+export const modelConfigQueryKeys = {
   all: ['model-config'] as const,
-  lists: () => [...contextSourceQueryKeys.all, 'list'] as const,
+  lists: () => [...modelConfigQueryKeys.all, 'list'] as const,
   list: (config: IQueryConfig, params: IQueryParams) =>
-    [...contextSourceQueryKeys.lists(), config, params] as const,
-  details: () => [...contextSourceQueryKeys.all, 'detail'] as const,
-  detail: (id: string) => [...contextSourceQueryKeys.details(), id] as const,
-  mcpServers: () => [...contextSourceQueryKeys.all, 'mcp-servers'] as const,
+    [...modelConfigQueryKeys.lists(), config, params] as const,
+  details: () => [...modelConfigQueryKeys.all, 'detail'] as const,
+  detail: (id: string) => [...modelConfigQueryKeys.details(), id] as const,
+  mcpServers: () => [...modelConfigQueryKeys.all, 'mcp-servers'] as const,
   mcpServersList: (id: string, params: IQueryParams) =>
-    [...contextSourceQueryKeys.mcpServers(), id, params] as const,
-  llmProviders: () => [...contextSourceQueryKeys.all, 'providers'] as const,
-  promptType: () => [...contextSourceQueryKeys.all, 'prompt-type'] as const,
+    [...modelConfigQueryKeys.mcpServers(), id, params] as const,
+  llmProviders: () => [...modelConfigQueryKeys.all, 'providers'] as const,
+  promptType: () => [...modelConfigQueryKeys.all, 'prompt-type'] as const,
 }
 
 export function useModelConfigs(
@@ -57,7 +57,7 @@ export function useModelConfigs(
   }
 ) {
   return useQuery({
-    queryKey: contextSourceQueryKeys.list(config, params),
+    queryKey: modelConfigQueryKeys.list(config, params),
     queryFn: async () => {
       try {
         if (!config.token) {
@@ -83,7 +83,7 @@ export function useModelConfig(
   }
 ) {
   return useQuery({
-    queryKey: contextSourceQueryKeys.detail(id),
+    queryKey: modelConfigQueryKeys.detail(id),
     queryFn: async () => {
       try {
         if (!config.token) {
@@ -122,7 +122,7 @@ export function useCreateModelConfig(
       }
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: modelConfigQueryKeys.lists() })
       toast.success('Model config created successfully', { duration: 3000 })
       options?.onSuccess?.(data)
     },
@@ -155,8 +155,8 @@ export function useUpdateModelConfig(
       }
     },
     onSuccess: (data) => {
-      queryClient.setQueryData(contextSourceQueryKeys.detail(data.id), data)
-      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
+      queryClient.setQueryData(modelConfigQueryKeys.detail(data.id), data)
+      queryClient.invalidateQueries({ queryKey: modelConfigQueryKeys.lists() })
       toast.success('Model config  updated successfully', { duration: 3000 })
       options?.onSuccess?.(data)
     },
@@ -189,8 +189,8 @@ export function useDeleteModelConfig(
       }
     },
     onSuccess: (_, id) => {
-      queryClient.removeQueries({ queryKey: contextSourceQueryKeys.detail(id) })
-      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.lists() })
+      queryClient.removeQueries({ queryKey: modelConfigQueryKeys.detail(id) })
+      queryClient.invalidateQueries({ queryKey: modelConfigQueryKeys.lists() })
       toast.success('Model config deleted successfully', { duration: 3000 })
       options?.onSuccess?.()
     },
@@ -211,7 +211,7 @@ export function useModelConfigMCPServers(
   }
 ) {
   return useQuery({
-    queryKey: contextSourceQueryKeys.mcpServersList(id, params),
+    queryKey: modelConfigQueryKeys.mcpServersList(id, params),
     queryFn: async () => {
       try {
         if (!config.token) {
@@ -251,7 +251,7 @@ export function useAttachModelConfigMCPServer(
       }
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.mcpServers() })
+      queryClient.invalidateQueries({ queryKey: modelConfigQueryKeys.mcpServers() })
       toast.success('MCP Server attached successfully', { duration: 3000 })
       options?.onSuccess?.(data)
     },
@@ -284,7 +284,7 @@ export function useDetachModelConfigMCPServer(
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: contextSourceQueryKeys.mcpServers() })
+      queryClient.invalidateQueries({ queryKey: modelConfigQueryKeys.mcpServers() })
       toast.success('MCP Server detached successfully', { duration: 3000 })
       options?.onSuccess?.()
     },
@@ -303,7 +303,7 @@ export function useLLMProviders(
   }
 ) {
   return useQuery({
-    queryKey: contextSourceQueryKeys.llmProviders(),
+    queryKey: modelConfigQueryKeys.llmProviders(),
     queryFn: async () => {
       try {
         if (!config.token) {
@@ -364,7 +364,7 @@ export function useModelConfigPromptType(
   }
 ) {
   return useQuery({
-    queryKey: contextSourceQueryKeys.promptType(),
+    queryKey: modelConfigQueryKeys.promptType(),
     queryFn: async () => {
       try {
         if (!config.token) {

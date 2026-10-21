@@ -44,9 +44,9 @@ export default function ModelConfigDetailLayout() {
   const breadcrumbs = useBreadcrumb({
     pathname,
     params,
-    apiUrl,
+    apiUrl: apiUrl!,
     nodeEnv,
-    token: token ?? undefined,
+    token: token!,
   })
 
   if (!isLoading && (error || !data)) {
