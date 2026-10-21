@@ -47,9 +47,9 @@ export default function McpServerDetailLayout() {
   const breadcrumbs = useBreadcrumb({
     pathname,
     params,
-    apiUrl,
+    apiUrl: apiUrl!,
     nodeEnv,
-    token: token ?? undefined,
+    token: token!,
   })
 
   const mcpServerID = params.mcpServerID

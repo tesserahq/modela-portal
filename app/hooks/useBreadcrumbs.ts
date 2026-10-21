@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useQueries } from '@tanstack/react-query'
+import { type QueryKey, useQueries } from '@tanstack/react-query'
 import { NodeENVType } from '@/libraries/fetch'
 import { BreadcrumbItemData } from 'tessera-ui'
 import { IQueryConfig } from '@/resources/queries'
@@ -10,6 +10,12 @@ import { getModelConfig } from '@/resources/queries/model-config'
 import { getSystemPrompt } from '@/resources/queries/system-prompt'
 import { getCompletionRequest } from '@/resources/queries/completion'
 import { getKnowledgeDocument } from '@/resources/queries/knowledge-documents'
+import { credentialQueryKeys } from '@/resources/hooks/credentials/use-credential'
+import { mcpServerQueryKeys } from '@/resources/hooks/mcp-servers/use-mcp-server'
+import { modelConfigQueryKeys } from '@/resources/hooks/model-config/use-model-config'
+import { systemPromptQueryKeys } from '@/resources/hooks/system-prompt/use-system-prompt'
+import { knowledgeDocumentQueryKeys } from '@/resources/hooks/knowledge-documents/use-knowledge-document'
+import { completionQueryKeys } from '@/resources/hooks/completion/use-completion'
 
 /**
  * Resource state per breadcrumb
@@ -26,9 +32,9 @@ export type BreadcrumbResourceState<T = any> = {
 interface BreadcrumbConfigType {
   pathname: string
   params: Record<string, string | undefined>
-  token?: string
-  apiUrl?: string
-  nodeEnv?: NodeENVType
+  token: string
+  apiUrl: string
+  nodeEnv: NodeENVType
 }
 
 /**
@@ -36,7 +42,7 @@ interface BreadcrumbConfigType {
  */
 type BreadcrumbQueryConfig = {
   paramKey: string
-  queryKey: string[]
+  queryKey: QueryKey
   queryFn: () => Promise<any>
   enabled: boolean
   staleTime: number
@@ -46,19 +52,36 @@ type BreadcrumbQueryConfig = {
  * Fetcher registry (NO HOOKS)
  */
 const breadcrumbFetchers = {
-  credentialID: (config: IQueryConfig, id: string) => getCredential(config, id),
-  mcpServerID: (config: IQueryConfig, id: string) => getMcpServer(config, id),
-  modelConfigID: (config: IQueryConfig, id: string) => getModelConfig(config, id),
-  promptID: (config: IQueryConfig, id: string) => getSystemPrompt(config, id),
-  completionID: (config: IQueryConfig, id: string) => getCompletionRequest(config, id),
-  knowledgeDocumentID: (config: IQueryConfig, id: string) => getKnowledgeDocument(config, id),
+  credentialID: {
+    queryKey: credentialQueryKeys.detail,
+    fetch: (config: IQueryConfig, id: string) => getCredential(config, id),
+  },
+  mcpServerID: {
+    queryKey: mcpServerQueryKeys.detail,
+    fetch: (config: IQueryConfig, id: string) => getMcpServer(config, id),
+  },
+  modelConfigID: {
+    queryKey: modelConfigQueryKeys.detail,
+    fetch: (config: IQueryConfig, id: string) => getModelConfig(config, id),
+  },
+  promptID: {
+    queryKey: systemPromptQueryKeys.detail,
+    fetch: (config: IQueryConfig, id: string) => getSystemPrompt(config, id),
+  },
+  completionID: {
+    queryKey: completionQueryKeys.detail,
+    fetch: (config: IQueryConfig, id: string) => getCompletionRequest(config, id),
+  },
+  knowledgeDocumentID: {
+    queryKey: knowledgeDocumentQueryKeys.detail,
+    fetch: (config: IQueryConfig, id: string) => getKnowledgeDocument(config, id),
+  },
 }
 
 export default function useBreadcrumb(config: BreadcrumbConfigType): BreadcrumbItemData[] {
   const { pathname, params, apiUrl, nodeEnv, token } = config
 
   const pathParts = pathname.split('/').filter(Boolean)
-  const canFetch = Boolean(token && apiUrl && nodeEnv)
 
   const queriesConfig = pathParts
     .map((part) => {
@@ -67,15 +90,16 @@ export default function useBreadcrumb(config: BreadcrumbConfigType): BreadcrumbI
       if (!matched) return null
 
       const [paramKey] = matched
-      const fetcher = breadcrumbFetchers[paramKey as keyof typeof breadcrumbFetchers]
+      const id = part
+      const resolver = breadcrumbFetchers[paramKey as keyof typeof breadcrumbFetchers]
 
-      if (!fetcher) return null
+      if (!resolver) return null
 
       return {
         paramKey,
-        queryKey: ['breadcrumb', paramKey, part],
-        queryFn: () => fetcher({ apiUrl: apiUrl!, token: token!, nodeEnv: nodeEnv! }, part),
-        enabled: canFetch,
+        queryKey: resolver.queryKey(id) as QueryKey,
+        queryFn: () => resolver.fetch({ apiUrl, token, nodeEnv }, id),
+        enabled: Boolean(token),
         staleTime: 5 * 60 * 1000,
       }
     })
