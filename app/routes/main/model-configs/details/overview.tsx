@@ -130,11 +130,11 @@ export default function ModelConfiglOverview() {
             <dt className="d-label">Default</dt>
             <dd className="d-content">
               {data?.is_default ? (
-                <Badge variant="outline" className="border border-green-500 text-green-600">
+                <Badge variant="outline" className="border border-primary text-primary">
                   <span className="text-xs">Yes</span>
                 </Badge>
               ) : (
-                <Badge variant="outline" className="border border-red-500 text-red-600">
+                <Badge variant="outline" className="border border-destructive text-destructive">
                   <span className="text-xs">No</span>
                 </Badge>
               )}

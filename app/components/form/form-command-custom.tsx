@@ -115,7 +115,7 @@ export function ComboBoxSelect<T>({
                     value={searchValue}
                     onSelect={() => handleSelect(id)}
                     className={cn(
-                      'dark:hover:bg-navy-300/20 cursor-pointer text-base hover:bg-slate-300/20',
+                      'dark:hover:bg-accent/50 cursor-pointer text-base hover:bg-accent/50',
                       value === id && 'bg-accent'
                     )}>
                     <Check

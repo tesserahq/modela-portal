@@ -93,7 +93,7 @@ export default function SystemPromptsIndex() {
         cell: ({ row }) => {
           if (!row.original.current_version) return <span>-</span>
           return (
-            <Badge variant="outline" className="border border-green-500 text-green-600 py-0">
+            <Badge variant="outline" className="border border-primary text-primary py-0">
               <span className="text-xs">v.{row.original.current_version.version_number}</span>
             </Badge>
           )

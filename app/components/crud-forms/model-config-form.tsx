@@ -584,7 +584,7 @@ export function ModelConfigForm({ defaultValues, onSubmit, submitLabel = 'Save',
               renderOption={(p) => (
                 <div className="flex space-x-3">
                   <span className="font-medium">{p.name}</span>
-                  <Badge variant="outline" className="border border-green-500 text-green-600 py-0">
+                  <Badge variant="outline" className="border border-primary text-primary py-0">
                     <span className="text-xs">v.{p.current_version?.version_number}</span>
                   </Badge>
                 </div>
