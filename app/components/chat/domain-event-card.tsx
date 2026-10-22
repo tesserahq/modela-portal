@@ -14,7 +14,7 @@ export function DomainEventCard({ event }: { event: ModelaEvent }) {
   return (
     <div className="border-border bg-background/70 my-1 rounded-md border px-3 py-2 shadow-sm">
       <div className="flex items-start gap-2">
-        <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-emerald-600" />
+        <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="font-medium">{eventName}</span>

@@ -86,17 +86,16 @@ export function DataTable<TData, TValue>({
       <div className="flex-1 overflow-hidden">
         <div ref={scrollContainerRef} className="no-scrollbar h-full overflow-y-auto">
           <Table>
-            <TableHeader
-              className="sticky top-0 z-10 w-full bg-slate-100/20 backdrop-blur-md
-                dark:bg-slate-800/50">
+            <TableHeader className="sticky top-0 z-10 w-full bg-muted/20 backdrop-blur-md
+              dark:bg-muted/50">
               {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id} className="border-border dark:hover:bg-navy-700">
+                <TableRow key={headerGroup.id} className="border-border dark:hover:bg-muted">
                   {headerGroup.headers.map((header) => {
                     return (
                       <TableHead
                         key={header.id}
                         className={cn(
-                          'text-navy-800 dark:text-navy-100 py-2 font-semibold',
+                          'text-foreground dark:text-foreground py-2 font-semibold',
                           (header.column.columnDef.meta as any)?.headerClassName
                         )}
                         style={{ width: header.column.columnDef.size }}>
@@ -113,7 +112,7 @@ export function DataTable<TData, TValue>({
                 </TableRow>
               ))}
             </TableHeader>
-            <TableBody className="bg-white dark:bg-transparent">
+            <TableBody className="bg-background dark:bg-background">
               {isLoading && <TableCellSkeletons table={table} count={skeletonRowCount} />}
 
               {!isLoading &&
@@ -123,14 +122,14 @@ export function DataTable<TData, TValue>({
                     key={row.id}
                     data-state={row.getIsSelected() && 'selected'}
                     className={cn(
-                      'dark:border-border dark:hover:bg-navy-600 hover:bg-slate-50',
+                      'dark:border-border dark:hover:bg-accent hover:bg-accent',
                       onRowClick && 'cursor-pointer'
                     )}
                     onClick={() => onRowClick?.(row.original)}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell
                         key={cell.id}
-                        className="text-navy-800 dark:text-navy-100 py-2 ps-4">
+                        className="text-foreground dark:text-foreground py-2 ps-4">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}

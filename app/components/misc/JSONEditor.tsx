@@ -54,13 +54,13 @@ export function JsonEditor({
       if (match.index > lastIndex) {
         parts.push({ text: jsonString.slice(lastIndex, match.index), className: 'text-foreground' })
       }
-      let className = 'text-blue-600 dark:text-blue-400'
+      let className = 'text-primary dark:text-primary'
       if (/^"/.test(match[0])) {
         className = /:$/.test(match[0])
-          ? 'text-purple-600 dark:text-purple-400'
-          : 'text-green-600 dark:text-green-400'
+          ? 'text-accent-foreground dark:text-accent-foreground'
+          : 'text-primary dark:text-primary'
       } else if (/true|false/.test(match[0])) {
-        className = 'text-orange-500 dark:text-orange-400'
+        className = 'text-accent-foreground dark:text-accent-foreground'
       } else if (/null/.test(match[0])) {
         className = 'text-muted-foreground'
       }
@@ -165,7 +165,7 @@ export function JsonEditor({
           {!readOnly && (
             <>
               {status === 'valid' && (
-                <span className="flex items-center gap-1 text-xs text-green-600 dark:text-green-400">
+                <span className="flex items-center gap-1 text-xs text-primary dark:text-primary">
                   valid JSON
                 </span>
               )}

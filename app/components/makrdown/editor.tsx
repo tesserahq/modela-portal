@@ -39,7 +39,7 @@ export default function MarkdownEditor({
             className="rounded-none !border-transparent py-2 text-xs !shadow-none
               hover:bg-transparent data-[state=active]:rounded-tr-sm
               data-[state=active]:!border-r-input data-[state=active]:!border-t-input
-              data-[state=active]:bg-white data-[state=active]:dark:bg-slate-800">
+              data-[state=active]:bg-background data-[state=active]:dark:bg-muted">
             Write
           </TabsTrigger>
           {showPreview && (
@@ -48,15 +48,18 @@ export default function MarkdownEditor({
               className="rounded-none !border-transparent py-2 text-xs !shadow-none
                 hover:bg-transparent data-[state=active]:rounded-tl-sm
                 data-[state=active]:rounded-tr-sm data-[state=active]:!border-input
-                data-[state=active]:!border-b-transparent data-[state=active]:bg-white
-                data-[state=active]:dark:bg-slate-800">
+                data-[state=active]:!border-b-transparent data-[state=active]:bg-background
+                data-[state=active]:dark:bg-muted">
               Preview
             </TabsTrigger>
           )}
         </TabsList>
         <TabsContent
           value="markdown"
-          className={cn('mt-0 bg-white dark:bg-slate-800', showPreview && 'border-t border-input')}>
+          className={cn(
+            'mt-0 bg-background dark:bg-muted',
+            showPreview && 'border-t border-input'
+          )}>
           <CodeMirror
             value={value}
             onChange={onUpdateChange}
@@ -70,7 +73,7 @@ export default function MarkdownEditor({
         {showPreview && (
           <TabsContent
             value="preview"
-            className="mt-0 border-t border-input bg-white p-3 dark:bg-slate-800">
+            className="mt-0 border-t border-input bg-background p-3 dark:bg-muted">
             <div className="overflow-scroll" style={{ height: editorHeight }}>
               <Markdown>{value}</Markdown>
             </div>

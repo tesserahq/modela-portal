@@ -87,7 +87,7 @@ export default function ModelConfigsIndex() {
               <div className="max-w-[200px] truncate" title={name}>
                 <span>{name || '-'}</span>
                 {isDefault && (
-                  <Badge variant="outline" className="border ml-2 border-green-500 text-green-600">
+                  <Badge variant="outline" className="border ml-2 border-primary text-primary">
                     <span className="text-xs">default</span>
                   </Badge>
                 )}

@@ -129,7 +129,7 @@ export default function SystemPromptOverview() {
               <dt className="d-label">Version</dt>
               <dd className="d-content">
                 {data?.current_version?.version_number ? (
-                  <Badge variant="outline" className="border border-green-500 text-green-600 py-0">
+                  <Badge variant="outline" className="border border-primary text-primary py-0">
                     <span className="text-xs">v.{data?.current_version?.version_number}</span>
                   </Badge>
                 ) : (

@@ -73,7 +73,7 @@ export default function SystemPromptVersionsIndex() {
           return (
             // <Link to={`/system-prompts/${row.original.id}`} className="button-link">
             <div className="max-w-[200px] truncate">
-              <Badge variant="outline" className="border border-green-500 text-green-600 py-0">
+              <Badge variant="outline" className="border border-primary text-primary py-0">
                 <span className="text-xs">v.{version_number}</span>
               </Badge>
             </div>
