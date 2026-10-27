@@ -58,6 +58,10 @@ export default function PrivateLayout() {
   const fetchToken = async () => {
     try {
       const token = await getAccessTokenSilently()
+      if (!token) {
+        navigate('/logout', { replace: true })
+        return
+      }
       setToken(token)
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
