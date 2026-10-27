@@ -9,10 +9,7 @@ import { KnowledgeDocumentType } from '@/resources/queries/knowledge-documents'
  * Add more resource types here as you implement them
  */
 export type BreadcrumbResourceData =
-  | CredentialType
-  | ModelConfigType
-  | McpServerType
-  | KnowledgeDocumentType
+  CredentialType | ModelConfigType | McpServerType | KnowledgeDocumentType
 
 /**
  * Configuration for breadcrumb generation
