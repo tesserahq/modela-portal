@@ -8,7 +8,8 @@ import { KnowledgeDocumentType } from '@/resources/queries/knowledge-documents'
  * Union type of all possible resource data types
  * Add more resource types here as you implement them
  */
-export type BreadcrumbResourceData = CredentialType | ModelConfigType | McpServerType | KnowledgeDocumentType
+export type BreadcrumbResourceData =
+  CredentialType | ModelConfigType | McpServerType | KnowledgeDocumentType
 
 /**
  * Configuration for breadcrumb generation
