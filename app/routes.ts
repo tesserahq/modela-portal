@@ -74,6 +74,8 @@ export default [
     route('/chat', 'routes/main/chat/index.tsx'),
 
     route('/analytics', 'routes/main/analytics/index.tsx'),
+
+    route('/model-catalog-changes', 'routes/main/model-catalog-changes/index.tsx'),
   ]),
 
   // Access Denied

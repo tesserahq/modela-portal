@@ -9,6 +9,7 @@ import {
   ChartBar,
   CloudCog,
   Database,
+  History,
   KeyRound,
   MessageCircle,
   PackageCheck,
@@ -111,6 +112,11 @@ export default function PrivateLayout() {
       title: 'Completions',
       path: `/completions`,
       icon: PackageCheck,
+    },
+    {
+      title: 'Model Catalog Changes',
+      path: `/model-catalog-changes`,
+      icon: History,
     },
     {
       title: 'Chat',
