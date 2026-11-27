@@ -60,3 +60,38 @@ export type ChatCompletionResponse = {
   choices: ChatCompletionChoice[]
   usage: ChatCompletionUsage
 }
+
+/**
+ * File-based request body (POST /scan/file, POST /summarize/file)
+ */
+export type FileRequest = {
+  file_url: string
+  mime_type: string
+  model: string
+}
+
+/**
+ * Scan response (POST /scan/file)
+ */
+export type ScanResponse = {
+  data: Record<string, unknown>
+  model: string
+  request_id: string
+}
+
+/**
+ * Summarize text request body (POST /summarize/text)
+ */
+export type SummarizeTextRequest = {
+  content: string
+  model: string
+}
+
+/**
+ * Summarize response (POST /summarize/text, POST /summarize/file)
+ */
+export type SummarizeResponse = {
+  summary: string
+  model: string
+  request_id: string
+}

@@ -232,6 +232,8 @@ export default function ModelConfiglOverview() {
         onOpenChange={setIsTestOpen}
         config={config}
         slug={data?.slug || ''}
+        configType={data?.config_type}
+        outputSchema={data?.output_schema}
       />
 
       <DeleteConfirmation ref={deleteConfirmationRef} />
